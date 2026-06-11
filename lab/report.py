@@ -2,6 +2,65 @@ import json
 import html
 from pathlib import Path
 
+# Definition of code snippets and parameters used for each use case
+CODE_DETAILS = {
+    "01_classify_email_department": {
+        "loader": "pipeline('zero-shot-classification', model='MoritzLaurer/deberta-v3-base-zeroshot-v2.0')",
+        "params": "candidate_labels=['IT', 'Planner', 'Pricing', 'Warehouse', 'Finance', 'HR']",
+        "call": "classifier(text, candidate_labels=CANDIDATE_LABELS)"
+    },
+    "02_classify_feedback_topic": {
+        "loader": "pipeline('zero-shot-classification', model='MoritzLaurer/deberta-v3-base-zeroshot-v2.0')",
+        "params": "candidate_labels=['product_quality', 'staff_service', 'pricing', 'store_experience', 'checkout_process']",
+        "call": "classifier(text, candidate_labels=CANDIDATE_LABELS)"
+    },
+    "03_classify_supplier_urgency": {
+        "loader": "pipeline('zero-shot-classification', model='MoritzLaurer/deberta-v3-base-zeroshot-v2.0')",
+        "params": "candidate_labels=['urgent', 'routine', 'dispute', 'delivery_update', 'invoice_query']",
+        "call": "classifier(text, candidate_labels=CANDIDATE_LABELS)"
+    },
+    "04_sentiment_customer_review": {
+        "loader": "pipeline('sentiment-analysis', model='cardiffnlp/twitter-roberta-base-sentiment-latest')",
+        "params": "None",
+        "call": "classifier(text)"
+    },
+    "05_sentiment_internal_escalation": {
+        "loader": "pipeline('sentiment-analysis', model='cardiffnlp/twitter-roberta-base-sentiment-latest')",
+        "params": "None",
+        "call": "classifier(text)\n# Map negative to 'escalated', positive/neutral to 'not_escalated'"
+    },
+    "06_ner_brands_locations": {
+        "loader": "pipeline('ner', model='dslim/bert-base-NER', aggregation_strategy='simple')",
+        "params": "None",
+        "call": "ner(text)\n# Evaluate set-overlap F1 score (threshold >= 0.66)"
+    },
+    "07_ner_people_orgs_procurement": {
+        "loader": "pipeline('ner', model='dslim/bert-base-NER', aggregation_strategy='simple')",
+        "params": "None",
+        "call": "ner(text)\n# Evaluate set-overlap F1 score (threshold >= 0.66)"
+    },
+    "08_similarity_complaint_lookup": {
+        "loader": "SentenceTransformer('sentence-transformers/all-mpnet-base-v2', device='cpu')",
+        "params": "corpus_embeddings = model.encode(corpus_texts)",
+        "call": "query_embedding = model.encode(query)\nutil.cos_sim(query_embedding, corpus_embeddings)[0]"
+    },
+    "09_similarity_sop_retrieval": {
+        "loader": "SentenceTransformer('sentence-transformers/all-mpnet-base-v2', device='cpu')",
+        "params": "corpus_embeddings = model.encode(corpus_texts)",
+        "call": "query_embedding = model.encode(query)\nutil.cos_sim(query_embedding, corpus_embeddings)[0]"
+    },
+    "10_language_detection": {
+        "loader": "pipeline('text-classification', model='papluca/xlm-roberta-base-language-detection')",
+        "params": "None",
+        "call": "classifier(text)"
+    },
+    "11_translate_zh_en": {
+        "loader": "AutoTokenizer.from_pretrained(model, src_lang='zho_Hans')\nAutoModelForSeq2SeqLM.from_pretrained(model)\nSentenceTransformer('all-mpnet-base-v2', device='cpu')",
+        "params": "forced_bos_token_id = tokenizer.convert_tokens_to_ids('eng_Latn')",
+        "call": "model.generate(**inputs, forced_bos_token_id=...)\n# Evaluate cosine similarity against reference using MPNet"
+    }
+}
+
 def render(results: dict, output_path: Path = Path("output/report.html")) -> None:
     """Renders a self-contained HTML report from the aggregated results."""
     run_metadata = results.get("run_metadata", {})
@@ -52,6 +111,11 @@ def render(results: dict, output_path: Path = Path("output/report.html")) -> Non
     use_case_details_html = ""
     for uc in use_cases:
         uc_id = uc.get("use_case_id", "")
+        code_details = CODE_DETAILS.get(uc_id, {
+            "loader": "N/A",
+            "params": "N/A",
+            "call": "N/A"
+        })
         uc_type = uc.get("type", "")
         description = uc.get("description", "")
         relevance = uc.get("domain_relevance", "")
@@ -142,6 +206,19 @@ def render(results: dict, output_path: Path = Path("output/report.html")) -> Non
                     <div>
                         <strong>Model &amp; Library:</strong>
                         <p class="mono">{html.escape(model)} ({html.escape(library)})</p>
+                        <div style="margin-top: 0.5rem;">
+                            <div class="code-info-container">
+                                <span class="info-icon-badge">ℹ️ View Code &amp; Params</span>
+                                <div class="code-tooltip">
+                                    <strong>Loader Snippet:</strong>
+                                    <pre>{html.escape(code_details.get("loader", "N/A"))}</pre>
+                                    <strong>Parameters:</strong>
+                                    <pre>{html.escape(code_details.get("params", "N/A"))}</pre>
+                                    <strong>Inference Call:</strong>
+                                    <pre>{html.escape(code_details.get("call", "N/A"))}</pre>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div>
                         <strong>Performance Summary:</strong>
@@ -507,6 +584,88 @@ def render(results: dict, output_path: Path = Path("output/report.html")) -> Non
         .notes-cell {{
             font-size: 0.8rem;
             color: var(--muted);
+        }}
+
+        /* Code reference tooltip */
+        .code-info-container {{
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+        }}
+
+        .info-icon-badge {{
+            background-color: #f0f9ff;
+            color: #0284c7;
+            border: 1px dashed #bae6fd;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.2rem 0.5rem;
+            border-radius: 0.25rem;
+            transition: all 0.2s;
+            user-select: none;
+        }}
+
+        .code-info-container:hover .info-icon-badge {{
+            background-color: #e0f2fe;
+            border-color: #7dd3fc;
+        }}
+
+        .code-tooltip {{
+            display: none;
+            position: absolute;
+            top: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #0f172a;
+            color: #e2e8f0;
+            border: 1px solid #334155;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            width: 340px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -4px rgba(0, 0, 0, 0.3);
+            z-index: 100;
+            text-align: left;
+        }}
+
+        .code-tooltip::after {{
+            content: "";
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: transparent transparent #0f172a transparent;
+        }}
+
+        .code-info-container:hover .code-tooltip {{
+            display: block;
+        }}
+
+        .code-tooltip strong {{
+            display: block;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #94a3b8;
+            margin-top: 0.5rem;
+            margin-bottom: 0.25rem;
+        }}
+
+        .code-tooltip strong:first-of-type {{
+            margin-top: 0;
+        }}
+
+        .code-tooltip pre {{
+            margin: 0;
+            background-color: #1e293b;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 0.75rem;
+            white-space: pre-wrap;
+            word-break: break-all;
+            color: #38bdf8;
         }}
 
         footer {{
