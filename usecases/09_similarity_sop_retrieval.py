@@ -17,7 +17,7 @@ from sentence_transformers import SentenceTransformer, util
 from lab.contract import build_result
 
 USE_CASE_ID = "09_similarity_sop_retrieval"
-MODEL_ID = "sentence-transformers/all-MiniLM-L6-v2"
+MODEL_ID = "sentence-transformers/all-mpnet-base-v2"
 TASK_TYPE = "semantic_similarity"
 
 CORPUS = [

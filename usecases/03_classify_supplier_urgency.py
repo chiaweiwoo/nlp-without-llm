@@ -17,7 +17,7 @@ from transformers import pipeline
 from lab.contract import build_result
 
 USE_CASE_ID = "03_classify_supplier_urgency"
-MODEL_ID = "facebook/bart-large-mnli"
+MODEL_ID = "MoritzLaurer/deberta-v3-base-zeroshot-v2.0"
 TASK_TYPE = "zero_shot_classification"
 
 CANDIDATE_LABELS = ["urgent", "routine", "dispute", "delivery_update", "invoice_query"]

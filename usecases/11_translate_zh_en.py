@@ -18,7 +18,7 @@ from sentence_transformers import SentenceTransformer, util
 from lab.contract import build_result
 
 USE_CASE_ID = "11_translate_zh_en"
-MODEL_ID = "Helsinki-NLP/opus-mt-zh-en"
+MODEL_ID = "facebook/nllb-200-distilled-600M"
 TASK_TYPE = "translation"
 
 TEST_CASES = [
@@ -29,11 +29,11 @@ TEST_CASES = [
 
 def run() -> dict:
     t0 = time.perf_counter()
-    # Load translation model and tokenizer directly
-    tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
+    # Load translation model and tokenizer directly (forcing source lang to Simplified Chinese)
+    tokenizer = AutoTokenizer.from_pretrained(MODEL_ID, src_lang="zho_Hans")
     translator_model = AutoModelForSeq2SeqLM.from_pretrained(MODEL_ID)
     # Load sentence similarity model (for evaluation)
-    similarity_model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2", device="cpu")
+    similarity_model = SentenceTransformer("sentence-transformers/all-mpnet-base-v2", device="cpu")
     load_time = time.perf_counter() - t0
 
     results = []
@@ -41,8 +41,12 @@ def run() -> dict:
         t1 = time.perf_counter()
         # Perform translation
         inputs = tokenizer(tc["input"], return_tensors="pt")
-        outputs = translator_model.generate(**inputs)
-        actual = tokenizer.decode(outputs[0], skip_special_tokens=True).strip()
+        translated_tokens = translator_model.generate(
+            **inputs,
+            forced_bos_token_id=tokenizer.convert_tokens_to_ids("eng_Latn"),
+            max_length=128
+        )
+        actual = tokenizer.batch_decode(translated_tokens, skip_special_tokens=True)[0].strip()
         
         # Calculate cosine similarity with reference translation
         emb1 = similarity_model.encode(actual, convert_to_tensor=True)
