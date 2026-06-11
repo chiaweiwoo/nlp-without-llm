@@ -471,7 +471,7 @@ def render(results: dict, output_path: Path = Path("output/report.html")) -> Non
         }}
 
         .card {{
-            overflow: hidden;
+            overflow: visible;
             margin-bottom: 2rem;
         }}
 
@@ -517,7 +517,7 @@ def render(results: dict, output_path: Path = Path("output/report.html")) -> Non
         }}
 
         .use-case-card {{
-            overflow: hidden;
+            overflow: visible;
             scroll-margin-top: 1rem;
         }}
 
@@ -533,6 +533,7 @@ def render(results: dict, output_path: Path = Path("output/report.html")) -> Non
         .use-case-content {{
             padding: 1.25rem;
             border-top: 1px solid var(--border-color);
+            overflow: visible;
         }}
 
         .header-left {{
@@ -593,6 +594,7 @@ def render(results: dict, output_path: Path = Path("output/report.html")) -> Non
             position: absolute;
             top: 125%;
             left: 0;
+            max-width: min(420px, calc(100vw - 3rem));
             background-color: #0f172a;
             color: #e2e8f0;
             border: 1px solid #334155;
