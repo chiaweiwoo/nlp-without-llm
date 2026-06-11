@@ -1,0 +1,23 @@
+[
+  {
+    "input": "Morning handover. The fragrance gondola was refilled before opening. A VIP traveller will collect a Cartier watch at 14:00 and customer service has been informed. The terminal manager requested a photo of the refreshed display.",
+    "expected": [
+      "A VIP traveller will collect a Cartier watch at 14:00 and customer service has been informed.",
+      "The terminal manager requested a photo of the refreshed display."
+    ]
+  },
+  {
+    "input": "Afternoon handover. The Dior preorder was not ready when the traveller arrived and customer service promised an update. The engraving machine remains offline and engineering will review it tomorrow morning. A replacement gift box was issued for a damaged cosmetics purchase.",
+    "expected": [
+      "The Dior preorder was not ready when the traveller arrived and customer service promised an update.",
+      "The engraving machine remains offline and engineering will review it tomorrow morning."
+    ]
+  },
+  {
+    "input": "Closing handover. Security could not account for one diamond bracelet after final count and the CCTV review has been escalated. The duty manager locked the jewellery cabinet and paused all bracelet sales. Housekeeping completed the standard boutique cleaning schedule.",
+    "expected": [
+      "Security could not account for one diamond bracelet after final count and the CCTV review has been escalated.",
+      "The duty manager locked the jewellery cabinet and paused all bracelet sales."
+    ]
+  }
+]

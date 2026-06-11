@@ -1,0 +1,88 @@
+{
+  "use_case_id": "14_fewshot_feedback_topic",
+  "type": "information_extraction",
+  "description": "Parse luxury-retail receipt and stock-transfer text with deterministic rules.",
+  "domain_relevance": "Many operational text formats are regular enough that local parsing beats heavier models on speed and reliability.",
+  "model": "curated_regex_parser_v1",
+  "library": "custom",
+  "model_load_time_s": 0.0,
+  "test_cases": [
+    {
+      "input": "Transfer 6 x SKU CH-8841 at SGD 2450 from T1 boutique to T3 collection desk.",
+      "expected": {
+        "quantity": 6,
+        "sku": "CH-8841",
+        "currency": "SGD",
+        "price": 2450,
+        "from_location": "T1 boutique",
+        "to_location": "T3 collection desk"
+      },
+      "actual": {
+        "quantity": 6,
+        "sku": "CH-8841",
+        "currency": "SGD",
+        "price": 2450,
+        "from_location": "T1 boutique",
+        "to_location": "T3 collection desk"
+      },
+      "passed": true,
+      "inference_time_s": 0.0003,
+      "notes": "field_count=6"
+    },
+    {
+      "input": "Receipt HKG-92817: 2 Dior fragrances, total HKD 2180.",
+      "expected": {
+        "receipt_id": "HKG-92817",
+        "quantity": 2,
+        "product": "Dior fragrances",
+        "currency": "HKD",
+        "total": 2180
+      },
+      "actual": {
+        "receipt_id": "HKG-92817",
+        "quantity": 2,
+        "product": "Dior fragrances",
+        "currency": "HKD",
+        "total": 2180
+      },
+      "passed": true,
+      "inference_time_s": 0.0002,
+      "notes": "field_count=5"
+    },
+    {
+      "input": "Received 11 of 12 Macallan 18 700ml bottles at Changi stockroom.",
+      "expected": {
+        "received_quantity": 11,
+        "expected_quantity": 12,
+        "product": "Macallan 18 700ml bottles",
+        "location": "Changi stockroom"
+      },
+      "actual": {
+        "received_quantity": 11,
+        "expected_quantity": 12,
+        "product": "Macallan 18 700ml bottles",
+        "location": "Changi stockroom"
+      },
+      "passed": true,
+      "inference_time_s": 0.0001,
+      "notes": "field_count=4"
+    }
+  ],
+  "pass_count": 3,
+  "total_count": 3,
+  "pass_rate": 1.0,
+  "total_inference_time_s": 0.0006,
+  "total_runtime_s": 0.0006,
+  "error": null,
+  "status": "ok",
+  "problem_name": "Template-Based Information Extraction",
+  "technique_name": "Regular expressions and deterministic parsing",
+  "application_name": "Parse luxury-retail receipt and stock-transfer text into structured fields.",
+  "comparison_group": "template_information_extraction",
+  "runtime_tier": "fast",
+  "primary_metric": "pass_rate",
+  "metrics": {
+    "pass_rate": 1.0
+  },
+  "completed_at": null
+}

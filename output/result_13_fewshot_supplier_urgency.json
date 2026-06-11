@@ -1,0 +1,52 @@
+{
+  "use_case_id": "13_fewshot_supplier_urgency",
+  "type": "extractive_qa",
+  "description": "Extract exact answers from luxury-retail policy passages.",
+  "domain_relevance": "Staff often need the exact rule from a policy, not just a similar document match.",
+  "model": "deepset/tinyroberta-squad2",
+  "library": "transformers",
+  "model_load_time_s": 1.9127,
+  "test_cases": [
+    {
+      "input": "How many days can unopened fragrance be returned?",
+      "expected": "14 days",
+      "actual": "14",
+      "passed": false,
+      "inference_time_s": 0.1182,
+      "notes": "start_idx=29 end_idx=29 context_length=207"
+    },
+    {
+      "input": "What must staff verify when the authenticity card is missing?",
+      "expected": "the serial number",
+      "actual": "the serial number",
+      "passed": true,
+      "inference_time_s": 0.0498,
+      "notes": "start_idx=29 end_idx=31 context_length=180"
+    },
+    {
+      "input": "Are opened cosmetics eligible for return?",
+      "expected": "not eligible for return",
+      "actual": "not eligible for return unless a product defect is confirmed by the boutique manager",
+      "passed": false,
+      "inference_time_s": 0.0552,
+      "notes": "start_idx=23 end_idx=36 context_length=148"
+    }
+  ],
+  "pass_count": 1,
+  "total_count": 3,
+  "pass_rate": 0.3333,
+  "total_inference_time_s": 0.2232,
+  "total_runtime_s": 2.1359,
+  "error": null,
+  "status": "ok",
+  "problem_name": "Extractive Question Answering",
+  "technique_name": "Transformer span extraction",
+  "application_name": "Extract exact policy answers from luxury-retail SOP text.",
+  "comparison_group": "extractive_question_answering",
+  "runtime_tier": "medium",
+  "primary_metric": "exact_match",
+  "metrics": {
+    "pass_rate": 0.3333
+  },
+  "completed_at": null
+}

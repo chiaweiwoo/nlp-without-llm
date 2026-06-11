@@ -1,0 +1,17 @@
+[
+  {
+    "premise": "The May airport campaign brief states that every Dior handbag display must include the gold podium stand and the airport-exclusive signage.",
+    "hypothesis": "The Dior handbag display includes the required podium stand and airport-exclusive signage.",
+    "expected": "entailment"
+  },
+  {
+    "premise": "The store report notes that the Dior handbag display was assembled before opening, but it does not mention the podium stand or signage.",
+    "hypothesis": "The Dior handbag display includes the required podium stand and airport-exclusive signage.",
+    "expected": "neutral"
+  },
+  {
+    "premise": "The evening audit recorded that the Dior handbag display used a silver shelf and omitted the airport-exclusive signage due to missing stock.",
+    "hypothesis": "The Dior handbag display includes the required podium stand and airport-exclusive signage.",
+    "expected": "contradiction"
+  }
+]

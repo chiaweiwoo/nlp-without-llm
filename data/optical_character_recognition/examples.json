@@ -1,0 +1,14 @@
+[
+  {
+    "image": "receipt_01.png",
+    "expected": "RECEIPT T1-8841 TOTAL SGD 2450"
+  },
+  {
+    "image": "receipt_02.png",
+    "expected": "RECEIPT HKG-92817 TOTAL HKD 2180"
+  },
+  {
+    "image": "receipt_03.png",
+    "expected": "PICKUP ORDER VIP-331 GATE C3"
+  }
+]

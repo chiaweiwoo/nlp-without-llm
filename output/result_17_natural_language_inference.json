@@ -1,0 +1,61 @@
+{
+  "use_case_id": "17_natural_language_inference",
+  "type": "natural_language_inference",
+  "description": "Classify luxury-retail promotion report pairs as entailment, neutral, or contradiction.",
+  "domain_relevance": "Compliance checks often depend on whether a store report confirms, omits, or contradicts the campaign brief.",
+  "model": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
+  "library": "transformers",
+  "model_load_time_s": 3.2581,
+  "test_cases": [
+    {
+      "input": {
+        "premise": "The May airport campaign brief states that every Dior handbag display must include the gold podium stand and the airport-exclusive signage.",
+        "hypothesis": "The Dior handbag display includes the required podium stand and airport-exclusive signage."
+      },
+      "expected": "entailment",
+      "actual": "entailment",
+      "passed": true,
+      "inference_time_s": 1.8942,
+      "notes": "class_probs=[entailment:0.85, neutral:0.132, contradiction:0.019]"
+    },
+    {
+      "input": {
+        "premise": "The store report notes that the Dior handbag display was assembled before opening, but it does not mention the podium stand or signage.",
+        "hypothesis": "The Dior handbag display includes the required podium stand and airport-exclusive signage."
+      },
+      "expected": "neutral",
+      "actual": "contradiction",
+      "passed": false,
+      "inference_time_s": 1.8077,
+      "notes": "class_probs=[entailment:0.0, neutral:0.038, contradiction:0.961]"
+    },
+    {
+      "input": {
+        "premise": "The evening audit recorded that the Dior handbag display used a silver shelf and omitted the airport-exclusive signage due to missing stock.",
+        "hypothesis": "The Dior handbag display includes the required podium stand and airport-exclusive signage."
+      },
+      "expected": "contradiction",
+      "actual": "contradiction",
+      "passed": true,
+      "inference_time_s": 1.7813,
+      "notes": "class_probs=[entailment:0.0, neutral:0.001, contradiction:0.999]"
+    }
+  ],
+  "pass_count": 2,
+  "total_count": 3,
+  "pass_rate": 0.6667,
+  "total_inference_time_s": 5.4832,
+  "total_runtime_s": 8.7413,
+  "error": null,
+  "status": "ok",
+  "problem_name": "Natural Language Inference",
+  "technique_name": "Three-way NLI classification",
+  "application_name": "Verify luxury-retail promotion compliance reports for entailment, neutrality, or contradiction.",
+  "comparison_group": "natural_language_inference",
+  "runtime_tier": "medium",
+  "primary_metric": "pass_rate",
+  "metrics": {
+    "pass_rate": 0.6667
+  },
+  "completed_at": null
+}

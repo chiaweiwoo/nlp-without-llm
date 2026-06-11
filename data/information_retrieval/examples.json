@@ -1,0 +1,14 @@
+[
+  {
+    "input": "Can a traveller return an unopened perfume without the original receipt?",
+    "expected": "sop_returns_unopened"
+  },
+  {
+    "input": "What should staff do when a luxury watch authenticity card is missing?",
+    "expected": "sop_authenticity_card"
+  },
+  {
+    "input": "Can an airport preorder be collected after the passenger's flight departs?",
+    "expected": "sop_missed_collection"
+  }
+]

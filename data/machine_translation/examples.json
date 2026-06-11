@@ -1,0 +1,14 @@
+[
+  {
+    "input": "这款手表有全球保修吗？",
+    "expected": "Does this watch come with a global warranty?"
+  },
+  {
+    "input": "我可以在登机前领取预订的香水吗？",
+    "expected": "Can I collect the reserved perfume before boarding?"
+  },
+  {
+    "input": "这个包是机场限定款吗？",
+    "expected": "Is this bag an airport-exclusive edition?"
+  }
+]

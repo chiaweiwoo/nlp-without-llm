@@ -1,0 +1,14 @@
+[
+  {
+    "input": "The beauty advisor explained the fragrance notes beautifully and wrapped everything with care.",
+    "expected": "positive"
+  },
+  {
+    "input": "The boutique had the handbag in stock, but only in the black colourway.",
+    "expected": "neutral"
+  },
+  {
+    "input": "The perfume box was damaged and the staff refused to replace it before boarding.",
+    "expected": "negative"
+  }
+]

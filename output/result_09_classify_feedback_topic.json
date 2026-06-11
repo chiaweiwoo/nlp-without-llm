@@ -1,0 +1,52 @@
+{
+  "use_case_id": "09_classify_feedback_topic",
+  "type": "multiclass_classification",
+  "description": "Route luxury-retail operational incidents with few-shot prototype classification over embeddings.",
+  "domain_relevance": "This compares a lightweight labelled-support approach against both rules and zero-shot NLI.",
+  "model": "sentence-transformers/all-mpnet-base-v2",
+  "library": "sentence-transformers",
+  "model_load_time_s": 6.668,
+  "test_cases": [
+    {
+      "input": "The limited-edition handbag still shows available online, but the boutique has no stock for collection.",
+      "expected": "inventory_exception",
+      "actual": "inventory_exception",
+      "passed": true,
+      "inference_time_s": 0.2302,
+      "notes": "prototype_cosine=[inventory_exception:0.6486, loss_prevention_exception:0.4411, client_service_exception:0.4063]"
+    },
+    {
+      "input": "A VIP traveller has waited forty minutes for preorder collection assistance at the cosmetics counter.",
+      "expected": "client_service_exception",
+      "actual": "client_service_exception",
+      "passed": true,
+      "inference_time_s": 0.1708,
+      "notes": "prototype_cosine=[client_service_exception:0.6078, inventory_exception:0.423, loss_prevention_exception:0.3521]"
+    },
+    {
+      "input": "A diamond bracelet is missing after the evening stock count in Terminal 2.",
+      "expected": "loss_prevention_exception",
+      "actual": "loss_prevention_exception",
+      "passed": true,
+      "inference_time_s": 0.149,
+      "notes": "prototype_cosine=[loss_prevention_exception:0.6617, inventory_exception:0.52, client_service_exception:0.3402]"
+    }
+  ],
+  "pass_count": 3,
+  "total_count": 3,
+  "pass_rate": 1.0,
+  "total_inference_time_s": 0.55,
+  "total_runtime_s": 7.218,
+  "error": null,
+  "status": "ok",
+  "problem_name": "Multiclass Text Classification",
+  "technique_name": "Few-shot embedding prototypes",
+  "application_name": "Route luxury-retail operational incidents into inventory, client service, or loss prevention.",
+  "comparison_group": "incident_routing",
+  "runtime_tier": "medium",
+  "primary_metric": "pass_rate",
+  "metrics": {
+    "pass_rate": 1.0
+  },
+  "completed_at": null
+}

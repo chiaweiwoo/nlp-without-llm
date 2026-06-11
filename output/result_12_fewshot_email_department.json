@@ -1,0 +1,52 @@
+{
+  "use_case_id": "12_fewshot_email_department",
+  "type": "information_retrieval",
+  "description": "Retrieve luxury-retail SOP passages by reranking lexical candidates with a local cross-encoder.",
+  "domain_relevance": "This shows the accuracy tradeoff when a slower but stronger local reranker is added after lexical retrieval.",
+  "model": "cross-encoder/ms-marco-MiniLM-L6-v2",
+  "library": "sentence-transformers",
+  "model_load_time_s": 4.3751,
+  "test_cases": [
+    {
+      "input": "Can a traveller return an unopened perfume without the original receipt?",
+      "expected": "sop_returns_unopened",
+      "actual": "sop_returns_unopened",
+      "passed": true,
+      "inference_time_s": 0.1914,
+      "notes": "rerank_scores=[sop_returns_unopened:4.955, sop_missed_collection:-7.933, sop_opened_cosmetics:-6.974] top_k=3"
+    },
+    {
+      "input": "What should staff do when a luxury watch authenticity card is missing?",
+      "expected": "sop_authenticity_card",
+      "actual": "sop_authenticity_card",
+      "passed": true,
+      "inference_time_s": 0.0832,
+      "notes": "rerank_scores=[sop_authenticity_card:8.438, sop_repair_watch:-2.847, sop_damaged_packaging:-4.123] top_k=3"
+    },
+    {
+      "input": "Can an airport preorder be collected after the passenger's flight departs?",
+      "expected": "sop_missed_collection",
+      "actual": "sop_missed_collection",
+      "passed": true,
+      "inference_time_s": 0.0602,
+      "notes": "rerank_scores=[sop_missed_collection:4.449, sop_returns_unopened:-9.752, sop_authenticity_card:-11.021] top_k=3"
+    }
+  ],
+  "pass_count": 3,
+  "total_count": 3,
+  "pass_rate": 1.0,
+  "total_inference_time_s": 0.3348,
+  "total_runtime_s": 4.7099,
+  "error": null,
+  "status": "ok",
+  "problem_name": "Information Retrieval",
+  "technique_name": "Cross-encoder reranking",
+  "application_name": "Retrieve luxury-retail SOP passages by reranking lexical candidates with a local cross-encoder.",
+  "comparison_group": "sop_retrieval",
+  "runtime_tier": "medium",
+  "primary_metric": "pass_rate",
+  "metrics": {
+    "pass_rate": 1.0
+  },
+  "completed_at": null
+}

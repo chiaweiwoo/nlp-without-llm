@@ -1,0 +1,52 @@
+{
+  "use_case_id": "15_entity_resolution_fuzzy",
+  "type": "entity_resolution",
+  "description": "Resolve informal luxury-retail product names with fuzzy string matching.",
+  "domain_relevance": "This provides a lightweight baseline for catalogue normalization without embeddings.",
+  "model": "curated_fuzzy_matcher_v1",
+  "library": "custom",
+  "model_load_time_s": 0.0,
+  "test_cases": [
+    {
+      "input": "JW Blue 1 litre",
+      "expected": "JW-BLUE-1L",
+      "actual": "JW-BLUE-1L",
+      "passed": true,
+      "inference_time_s": 0.0007,
+      "notes": "top_matches=[JW-BLUE-1L:0.4255, CART-TANK-L:0.2564, LV-KEEPALL-50:0.2564]"
+    },
+    {
+      "input": "Johnnie Walker Blue Label 1000ml",
+      "expected": "JW-BLUE-1L",
+      "actual": "JW-BLUE-1L",
+      "passed": true,
+      "inference_time_s": 0.0004,
+      "notes": "top_matches=[JW-BLUE-1L:1.0, MAC-18-700:0.3793, DIOR-SADDLE-BLK:0.3019]"
+    },
+    {
+      "input": "Jonnie Walker Blu 1L",
+      "expected": "JW-BLUE-1L",
+      "actual": "JW-BLUE-1L",
+      "passed": true,
+      "inference_time_s": 0.0003,
+      "notes": "top_matches=[JW-BLUE-1L:0.7692, MAC-18-700:0.3478, DIOR-SADDLE-BLK:0.3415]"
+    }
+  ],
+  "pass_count": 3,
+  "total_count": 3,
+  "pass_rate": 1.0,
+  "total_inference_time_s": 0.0014,
+  "total_runtime_s": 0.0014,
+  "error": null,
+  "status": "ok",
+  "problem_name": "Entity Resolution",
+  "technique_name": "String normalization and fuzzy matching",
+  "application_name": "Resolve informal luxury-retail product names to canonical catalogue SKUs.",
+  "comparison_group": "entity_resolution",
+  "runtime_tier": "fast",
+  "primary_metric": "pass_rate",
+  "metrics": {
+    "pass_rate": 1.0
+  },
+  "completed_at": null
+}

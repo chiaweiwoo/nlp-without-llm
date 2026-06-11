@@ -1,0 +1,1229 @@
+{
+  "run_metadata": {
+    "started_at": "2026-06-11T18:25:45.433856Z",
+    "finished_at": "2026-06-11T18:25:45.433856Z",
+    "total_wall_time_s": 0.0,
+    "host_os": "Windows-11",
+    "python_version": "3.13.13"
+  },
+  "use_cases": [
+    {
+      "use_case_id": "01_language_detection",
+      "type": "language_detection",
+      "description": "Identify the language of traveller enquiries before routing them to support.",
+      "domain_relevance": "Luxury-retail support teams receive enquiries from international travellers before departure.",
+      "model": "papluca/xlm-roberta-base-language-detection",
+      "library": "transformers",
+      "model_load_time_s": 5.0707,
+      "test_cases": [
+        {
+          "input": "这款限量版手袋在登机前可以领取吗？",
+          "expected": "zh",
+          "actual": "zh",
+          "passed": true,
+          "inference_time_s": 0.6977,
+          "notes": "raw_label=zh score=0.9908"
+        },
+        {
+          "input": "Est-ce que cette montre est disponible au terminal 3 ?",
+          "expected": "fr",
+          "actual": "fr",
+          "passed": true,
+          "inference_time_s": 0.0873,
+          "notes": "raw_label=fr score=0.9939"
+        },
+        {
+          "input": "이 향수는 면세 할인이 적용되나요?",
+          "expected": "ko",
+          "actual": "ja",
+          "passed": false,
+          "inference_time_s": 0.0764,
+          "notes": "raw_label=ja score=0.5548"
+        }
+      ],
+      "pass_count": 2,
+      "total_count": 3,
+      "pass_rate": 0.6667,
+      "total_inference_time_s": 0.8614,
+      "total_runtime_s": 5.9321,
+      "error": null,
+      "status": "ok",
+      "problem_name": "Language Identification",
+      "technique_name": "Transformer classification",
+      "application_name": "Identify the language of traveller enquiries for luxury-retail support triage.",
+      "comparison_group": "language_identification",
+      "runtime_tier": "fast",
+      "primary_metric": "pass_rate",
+      "metrics": {
+        "pass_rate": 0.6667
+      },
+      "completed_at": null
+    },
+    {
+      "use_case_id": "02_translate_zh_en",
+      "type": "translation",
+      "description": "Translate Mandarin luxury-retail enquiries into English for staff triage.",
+      "domain_relevance": "Airport luxury boutiques often need quick local translation before boarding windows close.",
+      "model": "facebook/nllb-200-distilled-600M",
+      "library": "transformers",
+      "model_load_time_s": 11.3754,
+      "test_cases": [
+        {
+          "input": "这款手表有全球保修吗？",
+          "expected": "Does this watch come with a global warranty?",
+          "actual": "Is this watch global warranty?",
+          "passed": true,
+          "inference_time_s": 3.3656,
+          "notes": "actual='Is this watch global warranty?' cosine=0.9023"
+        },
+        {
+          "input": "我可以在登机前领取预订的香水吗？",
+          "expected": "Can I collect the reserved perfume before boarding?",
+          "actual": "Can I get the booked perfume before boarding?",
+          "passed": true,
+          "inference_time_s": 2.2743,
+          "notes": "actual='Can I get the booked perfume before boarding?' cosine=0.9005"
+        },
+        {
+          "input": "这个包是机场限定款吗？",
+          "expected": "Is this bag an airport-exclusive edition?",
+          "actual": "Is this a limited amount for the airport?",
+          "passed": false,
+          "inference_time_s": 1.9709,
+          "notes": "actual='Is this a limited amount for the airport?' cosine=0.5702"
+        }
+      ],
+      "pass_count": 2,
+      "total_count": 3,
+      "pass_rate": 0.6667,
+      "total_inference_time_s": 7.6108,
+      "total_runtime_s": 18.9862,
+      "error": null,
+      "status": "ok",
+      "problem_name": "Machine Translation",
+      "technique_name": "Encoder-decoder transformer",
+      "application_name": "Translate Mandarin luxury-retail enquiries into English for boutique and airport staff.",
+      "comparison_group": "machine_translation",
+      "runtime_tier": "heavy",
+      "primary_metric": "pass_rate",
+      "metrics": {
+        "pass_rate": 0.6667
+      },
+      "completed_at": null
+    },
+    {
+      "use_case_id": "03_sentiment_customer_review",
+      "type": "sentiment",
+      "description": "Score luxury-retail customer review sentiment with a transparent domain lexicon.",
+      "domain_relevance": "A simple baseline helps measure whether a small local transformer is worth the extra cost.",
+      "model": "curated_luxury_retail_lexicon_v1",
+      "library": "custom",
+      "model_load_time_s": 0.0,
+      "test_cases": [
+        {
+          "input": "The beauty advisor explained the fragrance notes beautifully and wrapped everything with care.",
+          "expected": "positive",
+          "actual": "positive",
+          "passed": true,
+          "inference_time_s": 0.0001,
+          "notes": "positive_hits=2 negative_hits=0 token_count=13"
+        },
+        {
+          "input": "The boutique had the handbag in stock, but only in the black colourway.",
+          "expected": "neutral",
+          "actual": "neutral",
+          "passed": true,
+          "inference_time_s": 0.0,
+          "notes": "positive_hits=0 negative_hits=0 token_count=13"
+        },
+        {
+          "input": "The perfume box was damaged and the staff refused to replace it before boarding.",
+          "expected": "negative",
+          "actual": "negative",
+          "passed": true,
+          "inference_time_s": 0.0,
+          "notes": "positive_hits=0 negative_hits=2 token_count=14"
+        }
+      ],
+      "pass_count": 3,
+      "total_count": 3,
+      "pass_rate": 1.0,
+      "total_inference_time_s": 0.0001,
+      "total_runtime_s": 0.0001,
+      "error": null,
+      "status": "ok",
+      "problem_name": "Sentiment Analysis",
+      "technique_name": "Lexicon scoring",
+      "application_name": "Evaluate post-purchase luxury-retail reviews with a transparent lexicon baseline.",
+      "comparison_group": "sentiment_analysis",
+      "runtime_tier": "fast",
+      "primary_metric": "pass_rate",
+      "metrics": {
+        "pass_rate": 1.0
+      },
+      "completed_at": null
+    },
+    {
+      "use_case_id": "04_sentiment_internal_escalation",
+      "type": "sentiment",
+      "description": "Score luxury-retail customer review sentiment with a pretrained transformer classifier.",
+      "domain_relevance": "This provides a higher-capability local baseline to compare against the lexicon method.",
+      "model": "cardiffnlp/twitter-roberta-base-sentiment-latest",
+      "library": "transformers",
+      "model_load_time_s": 2.3371,
+      "test_cases": [
+        {
+          "input": "The beauty advisor explained the fragrance notes beautifully and wrapped everything with care.",
+          "expected": "positive",
+          "actual": "positive",
+          "passed": true,
+          "inference_time_s": 0.5334,
+          "notes": "raw_label=positive score=0.93"
+        },
+        {
+          "input": "The boutique had the handbag in stock, but only in the black colourway.",
+          "expected": "neutral",
+          "actual": "neutral",
+          "passed": true,
+          "inference_time_s": 0.0764,
+          "notes": "raw_label=neutral score=0.9066"
+        },
+        {
+          "input": "The perfume box was damaged and the staff refused to replace it before boarding.",
+          "expected": "negative",
+          "actual": "negative",
+          "passed": true,
+          "inference_time_s": 0.0854,
+          "notes": "raw_label=negative score=0.8803"
+        }
+      ],
+      "pass_count": 3,
+      "total_count": 3,
+      "pass_rate": 1.0,
+      "total_inference_time_s": 0.6952,
+      "total_runtime_s": 3.0323,
+      "error": null,
+      "status": "ok",
+      "problem_name": "Sentiment Analysis",
+      "technique_name": "Transformer sequence classification",
+      "application_name": "Evaluate post-purchase luxury-retail reviews with a pretrained transformer classifier.",
+      "comparison_group": "sentiment_analysis",
+      "runtime_tier": "medium",
+      "primary_metric": "pass_rate",
+      "metrics": {
+        "pass_rate": 1.0
+      },
+      "completed_at": null
+    },
+    {
+      "use_case_id": "05_ner_brands_locations",
+      "type": "ner",
+      "description": "Extract brands, people, organisations, and locations with a luxury-retail gazetteer baseline.",
+      "domain_relevance": "A deterministic baseline shows how far curated phrase matching can go before a transformer is needed.",
+      "model": "curated_luxury_retail_gazetteer_v1",
+      "library": "custom",
+      "model_load_time_s": 0.0,
+      "test_cases": [
+        {
+          "input": "Dior confirmed the reservation at Changi Terminal 1 for Sophie Tan.",
+          "expected": [
+            [
+              "Changi Terminal 1",
+              "LOC"
+            ],
+            [
+              "Dior",
+              "ORG"
+            ],
+            [
+              "Sophie Tan",
+              "PER"
+            ]
+          ],
+          "actual": [
+            [
+              "Changi Terminal 1",
+              "LOC"
+            ],
+            [
+              "Dior",
+              "ORG"
+            ],
+            [
+              "Sophie Tan",
+              "PER"
+            ]
+          ],
+          "passed": true,
+          "inference_time_s": 0.0001,
+          "notes": "precision=1.0 recall=1.0 f1=1.0"
+        },
+        {
+          "input": "Cartier asked James Wu from Heathrow Boutique to verify the watch pickup.",
+          "expected": [
+            [
+              "Cartier",
+              "ORG"
+            ],
+            [
+              "Heathrow Boutique",
+              "ORG"
+            ],
+            [
+              "James Wu",
+              "PER"
+            ]
+          ],
+          "actual": [
+            [
+              "Cartier",
+              "ORG"
+            ],
+            [
+              "Heathrow Boutique",
+              "ORG"
+            ],
+            [
+              "James Wu",
+              "PER"
+            ]
+          ],
+          "passed": true,
+          "inference_time_s": 0.0,
+          "notes": "precision=1.0 recall=1.0 f1=1.0"
+        },
+        {
+          "input": "Macallan inventory for Hong Kong Airport was signed off by Elaine Lim.",
+          "expected": [
+            [
+              "Elaine Lim",
+              "PER"
+            ],
+            [
+              "Hong Kong Airport",
+              "LOC"
+            ],
+            [
+              "Macallan",
+              "ORG"
+            ]
+          ],
+          "actual": [
+            [
+              "Elaine Lim",
+              "PER"
+            ],
+            [
+              "Hong Kong Airport",
+              "LOC"
+            ],
+            [
+              "Macallan",
+              "ORG"
+            ]
+          ],
+          "passed": true,
+          "inference_time_s": 0.0,
+          "notes": "precision=1.0 recall=1.0 f1=1.0"
+        }
+      ],
+      "pass_count": 3,
+      "total_count": 3,
+      "pass_rate": 1.0,
+      "total_inference_time_s": 0.0001,
+      "total_runtime_s": 0.0001,
+      "error": null,
+      "status": "ok",
+      "problem_name": "Named Entity Recognition",
+      "technique_name": "Gazetteer and phrase matching",
+      "application_name": "Extract brands, people, organisations, and locations from luxury-retail service notes.",
+      "comparison_group": "named_entity_recognition",
+      "runtime_tier": "fast",
+      "primary_metric": "entity_f1_threshold",
+      "metrics": {
+        "pass_rate": 1.0
+      },
+      "completed_at": null
+    },
+    {
+      "use_case_id": "06_ner_people_orgs_procurement",
+      "type": "ner",
+      "description": "Extract brands, people, organisations, and locations with a pretrained transformer tagger.",
+      "domain_relevance": "This measures the accuracy gain from a general transformer NER model on luxury-retail notes.",
+      "model": "dslim/bert-base-NER",
+      "library": "transformers",
+      "model_load_time_s": 1.9045,
+      "test_cases": [
+        {
+          "input": "Dior confirmed the reservation at Changi Terminal 1 for Sophie Tan.",
+          "expected": [
+            [
+              "Changi Terminal 1",
+              "LOC"
+            ],
+            [
+              "Dior",
+              "ORG"
+            ],
+            [
+              "Sophie Tan",
+              "PER"
+            ]
+          ],
+          "actual": [
+            [
+              "Changi Terminal 1",
+              "LOC"
+            ],
+            [
+              "Dior",
+              "ORG"
+            ],
+            [
+              "Sophie Tan",
+              "PER"
+            ]
+          ],
+          "passed": true,
+          "inference_time_s": 0.4923,
+          "notes": "precision=1.0 recall=1.0 f1=1.0 raw_ner=[('Dior', 'ORG'), ('Changi Terminal 1', 'LOC'), ('Sophie Tan', 'PER')]"
+        },
+        {
+          "input": "Cartier asked James Wu from Heathrow Boutique to verify the watch pickup.",
+          "expected": [
+            [
+              "Cartier",
+              "ORG"
+            ],
+            [
+              "Heathrow Boutique",
+              "ORG"
+            ],
+            [
+              "James Wu",
+              "PER"
+            ]
+          ],
+          "actual": [
+            [
+              "##tier",
+              "ORG"
+            ],
+            [
+              "Car",
+              "PER"
+            ],
+            [
+              "Heathrow Boutique",
+              "ORG"
+            ],
+            [
+              "James Wu",
+              "PER"
+            ]
+          ],
+          "passed": false,
+          "inference_time_s": 0.0685,
+          "notes": "precision=0.5 recall=0.6667 f1=0.5714 raw_ner=[('Car', 'PER'), ('##tier', 'ORG'), ('James Wu', 'PER'), ('Heathrow Boutique', 'ORG')]"
+        },
+        {
+          "input": "Macallan inventory for Hong Kong Airport was signed off by Elaine Lim.",
+          "expected": [
+            [
+              "Elaine Lim",
+              "PER"
+            ],
+            [
+              "Hong Kong Airport",
+              "LOC"
+            ],
+            [
+              "Macallan",
+              "ORG"
+            ]
+          ],
+          "actual": [
+            [
+              "Elaine Lim",
+              "PER"
+            ],
+            [
+              "Hong Kong Airport",
+              "LOC"
+            ],
+            [
+              "Macallan",
+              "ORG"
+            ]
+          ],
+          "passed": true,
+          "inference_time_s": 0.0753,
+          "notes": "precision=1.0 recall=1.0 f1=1.0 raw_ner=[('Macallan', 'ORG'), ('Hong Kong Airport', 'LOC'), ('Elaine Lim', 'PER')]"
+        }
+      ],
+      "pass_count": 2,
+      "total_count": 3,
+      "pass_rate": 0.6667,
+      "total_inference_time_s": 0.6361,
+      "total_runtime_s": 2.5406,
+      "error": null,
+      "status": "ok",
+      "problem_name": "Named Entity Recognition",
+      "technique_name": "Transformer token classification",
+      "application_name": "Extract brands, people, organisations, and locations from luxury-retail service notes.",
+      "comparison_group": "named_entity_recognition",
+      "runtime_tier": "medium",
+      "primary_metric": "entity_f1_threshold",
+      "metrics": {
+        "pass_rate": 0.6667
+      },
+      "completed_at": null
+    },
+    {
+      "use_case_id": "07_classify_email_department",
+      "type": "multiclass_classification",
+      "description": "Route luxury-retail operational incidents with keyword-based rules.",
+      "domain_relevance": "A deterministic rules baseline reveals where simple routing is already sufficient.",
+      "model": "curated_luxury_retail_rules_v1",
+      "library": "custom",
+      "model_load_time_s": 0.0,
+      "test_cases": [
+        {
+          "input": "The limited-edition handbag still shows available online, but the boutique has no stock for collection.",
+          "expected": "inventory_exception",
+          "actual": "inventory_exception",
+          "passed": true,
+          "inference_time_s": 0.0,
+          "notes": "scores=[inventory_exception:2, client_service_exception:1, loss_prevention_exception:0]"
+        },
+        {
+          "input": "A VIP traveller has waited forty minutes for preorder collection assistance at the cosmetics counter.",
+          "expected": "client_service_exception",
+          "actual": "client_service_exception",
+          "passed": true,
+          "inference_time_s": 0.0,
+          "notes": "scores=[inventory_exception:0, client_service_exception:5, loss_prevention_exception:1]"
+        },
+        {
+          "input": "A diamond bracelet is missing after the evening stock count in Terminal 2.",
+          "expected": "loss_prevention_exception",
+          "actual": "loss_prevention_exception",
+          "passed": true,
+          "inference_time_s": 0.0,
+          "notes": "scores=[inventory_exception:1, client_service_exception:0, loss_prevention_exception:3]"
+        }
+      ],
+      "pass_count": 3,
+      "total_count": 3,
+      "pass_rate": 1.0,
+      "total_inference_time_s": 0.0,
+      "total_runtime_s": 0.0,
+      "error": null,
+      "status": "ok",
+      "problem_name": "Multiclass Text Classification",
+      "technique_name": "Keyword rules",
+      "application_name": "Route luxury-retail operational incidents into inventory, client service, or loss prevention.",
+      "comparison_group": "incident_routing",
+      "runtime_tier": "fast",
+      "primary_metric": "pass_rate",
+      "metrics": {
+        "pass_rate": 1.0
+      },
+      "completed_at": null
+    },
+    {
+      "use_case_id": "08_classify_supplier_urgency",
+      "type": "multiclass_classification",
+      "description": "Route luxury-retail operational incidents with zero-shot NLI classification.",
+      "domain_relevance": "This shows how a local NLI model handles incident routing without labelled task-specific training.",
+      "model": "MoritzLaurer/deberta-v3-base-zeroshot-v2.0",
+      "library": "transformers",
+      "model_load_time_s": 3.3496,
+      "test_cases": [
+        {
+          "input": "The limited-edition handbag still shows available online, but the boutique has no stock for collection.",
+          "expected": "inventory_exception",
+          "actual": "inventory_exception",
+          "passed": true,
+          "inference_time_s": 5.5213,
+          "notes": "scores=[inventory_exception:0.983, loss_prevention_exception:0.027, client_service_exception:0.024]"
+        },
+        {
+          "input": "A VIP traveller has waited forty minutes for preorder collection assistance at the cosmetics counter.",
+          "expected": "client_service_exception",
+          "actual": "client_service_exception",
+          "passed": true,
+          "inference_time_s": 5.1538,
+          "notes": "scores=[client_service_exception:0.52, inventory_exception:0.097, loss_prevention_exception:0.0]"
+        },
+        {
+          "input": "A diamond bracelet is missing after the evening stock count in Terminal 2.",
+          "expected": "loss_prevention_exception",
+          "actual": "inventory_exception",
+          "passed": false,
+          "inference_time_s": 5.2636,
+          "notes": "scores=[inventory_exception:0.917, loss_prevention_exception:0.519, client_service_exception:0.018]"
+        }
+      ],
+      "pass_count": 2,
+      "total_count": 3,
+      "pass_rate": 0.6667,
+      "total_inference_time_s": 15.9387,
+      "total_runtime_s": 19.2883,
+      "error": null,
+      "status": "ok",
+      "problem_name": "Multiclass Text Classification",
+      "technique_name": "Zero-shot NLI classification",
+      "application_name": "Route luxury-retail operational incidents into inventory, client service, or loss prevention.",
+      "comparison_group": "incident_routing",
+      "runtime_tier": "medium",
+      "primary_metric": "pass_rate",
+      "metrics": {
+        "pass_rate": 0.6667
+      },
+      "completed_at": null
+    },
+    {
+      "use_case_id": "09_classify_feedback_topic",
+      "type": "multiclass_classification",
+      "description": "Route luxury-retail operational incidents with few-shot prototype classification over embeddings.",
+      "domain_relevance": "This compares a lightweight labelled-support approach against both rules and zero-shot NLI.",
+      "model": "sentence-transformers/all-mpnet-base-v2",
+      "library": "sentence-transformers",
+      "model_load_time_s": 6.668,
+      "test_cases": [
+        {
+          "input": "The limited-edition handbag still shows available online, but the boutique has no stock for collection.",
+          "expected": "inventory_exception",
+          "actual": "inventory_exception",
+          "passed": true,
+          "inference_time_s": 0.2302,
+          "notes": "prototype_cosine=[inventory_exception:0.6486, loss_prevention_exception:0.4411, client_service_exception:0.4063]"
+        },
+        {
+          "input": "A VIP traveller has waited forty minutes for preorder collection assistance at the cosmetics counter.",
+          "expected": "client_service_exception",
+          "actual": "client_service_exception",
+          "passed": true,
+          "inference_time_s": 0.1708,
+          "notes": "prototype_cosine=[client_service_exception:0.6078, inventory_exception:0.423, loss_prevention_exception:0.3521]"
+        },
+        {
+          "input": "A diamond bracelet is missing after the evening stock count in Terminal 2.",
+          "expected": "loss_prevention_exception",
+          "actual": "loss_prevention_exception",
+          "passed": true,
+          "inference_time_s": 0.149,
+          "notes": "prototype_cosine=[loss_prevention_exception:0.6617, inventory_exception:0.52, client_service_exception:0.3402]"
+        }
+      ],
+      "pass_count": 3,
+      "total_count": 3,
+      "pass_rate": 1.0,
+      "total_inference_time_s": 0.55,
+      "total_runtime_s": 7.218,
+      "error": null,
+      "status": "ok",
+      "problem_name": "Multiclass Text Classification",
+      "technique_name": "Few-shot embedding prototypes",
+      "application_name": "Route luxury-retail operational incidents into inventory, client service, or loss prevention.",
+      "comparison_group": "incident_routing",
+      "runtime_tier": "medium",
+      "primary_metric": "pass_rate",
+      "metrics": {
+        "pass_rate": 1.0
+      },
+      "completed_at": null
+    },
+    {
+      "use_case_id": "10_similarity_complaint_lookup",
+      "type": "information_retrieval",
+      "description": "Retrieve luxury-retail SOP passages with BM25 lexical search.",
+      "domain_relevance": "This baseline shows how far classical lexical retrieval goes before embeddings or reranking are needed.",
+      "model": "curated_bm25_retriever_v1",
+      "library": "custom",
+      "model_load_time_s": 0.0002,
+      "test_cases": [
+        {
+          "input": "Can a traveller return an unopened perfume without the original receipt?",
+          "expected": "sop_returns_unopened",
+          "actual": "sop_returns_unopened",
+          "passed": true,
+          "inference_time_s": 0.0002,
+          "notes": "bm25_scores=[sop_returns_unopened:5.1356, sop_authenticity_card:0.5443, sop_missed_collection:2.5223, sop_opened_cosmetics:2.1014, sop_repair_watch:0.5779, sop_damaged_packaging:0.1206] matched_text='Unopened fragrance and cosmetics items may be returned within 14 days with the original receipt and full packaging.'"
+        },
+        {
+          "input": "What should staff do when a luxury watch authenticity card is missing?",
+          "expected": "sop_authenticity_card",
+          "actual": "sop_authenticity_card",
+          "passed": true,
+          "inference_time_s": 0.0001,
+          "notes": "bm25_scores=[sop_returns_unopened:0.0, sop_authenticity_card:6.6819, sop_missed_collection:1.0057, sop_opened_cosmetics:1.1598, sop_repair_watch:4.5265, sop_damaged_packaging:2.8065] matched_text='If a watch authenticity card is missing, staff must verify the serial number, contact the brand liaison, and document the handover before release.'"
+        },
+        {
+          "input": "Can an airport preorder be collected after the passenger's flight departs?",
+          "expected": "sop_missed_collection",
+          "actual": "sop_missed_collection",
+          "passed": true,
+          "inference_time_s": 0.0001,
+          "notes": "bm25_scores=[sop_returns_unopened:1.7659, sop_authenticity_card:0.1206, sop_missed_collection:2.8452, sop_opened_cosmetics:0.0757, sop_repair_watch:0.083, sop_damaged_packaging:0.1206] matched_text='If a traveller misses airport preorder collection, staff must cancel the airside hold, move the item to customer service review, and contact the traveller for next steps.'"
+        }
+      ],
+      "pass_count": 3,
+      "total_count": 3,
+      "pass_rate": 1.0,
+      "total_inference_time_s": 0.0004,
+      "total_runtime_s": 0.0006,
+      "error": null,
+      "status": "ok",
+      "problem_name": "Information Retrieval",
+      "technique_name": "BM25 lexical retrieval",
+      "application_name": "Retrieve luxury-retail SOP passages for staff questions using lexical matching.",
+      "comparison_group": "sop_retrieval",
+      "runtime_tier": "fast",
+      "primary_metric": "pass_rate",
+      "metrics": {
+        "pass_rate": 1.0
+      },
+      "completed_at": null
+    },
+    {
+      "use_case_id": "11_similarity_sop_retrieval",
+      "type": "information_retrieval",
+      "description": "Retrieve luxury-retail SOP passages with dense bi-encoder embeddings.",
+      "domain_relevance": "This measures the semantic retrieval gain from local embeddings over purely lexical search.",
+      "model": "sentence-transformers/all-mpnet-base-v2",
+      "library": "sentence-transformers",
+      "model_load_time_s": 6.0766,
+      "test_cases": [
+        {
+          "input": "Can a traveller return an unopened perfume without the original receipt?",
+          "expected": "sop_returns_unopened",
+          "actual": "sop_returns_unopened",
+          "passed": true,
+          "inference_time_s": 0.0836,
+          "notes": "cosine_scores=[sop_returns_unopened:0.729, sop_authenticity_card:0.328, sop_missed_collection:0.285, sop_opened_cosmetics:0.64, sop_repair_watch:0.191, sop_damaged_packaging:0.338] matched_text='Unopened fragrance and cosmetics items may be returned within 14 days with the original receipt and full packaging.'"
+        },
+        {
+          "input": "What should staff do when a luxury watch authenticity card is missing?",
+          "expected": "sop_authenticity_card",
+          "actual": "sop_authenticity_card",
+          "passed": true,
+          "inference_time_s": 0.079,
+          "notes": "cosine_scores=[sop_returns_unopened:0.298, sop_authenticity_card:0.829, sop_missed_collection:0.251, sop_opened_cosmetics:0.325, sop_repair_watch:0.632, sop_damaged_packaging:0.442] matched_text='If a watch authenticity card is missing, staff must verify the serial number, contact the brand liaison, and document the handover before release.'"
+        },
+        {
+          "input": "Can an airport preorder be collected after the passenger's flight departs?",
+          "expected": "sop_missed_collection",
+          "actual": "sop_missed_collection",
+          "passed": true,
+          "inference_time_s": 0.0819,
+          "notes": "cosine_scores=[sop_returns_unopened:0.186, sop_authenticity_card:0.119, sop_missed_collection:0.689, sop_opened_cosmetics:0.102, sop_repair_watch:-0.013, sop_damaged_packaging:0.187] matched_text='If a traveller misses airport preorder collection, staff must cancel the airside hold, move the item to customer service review, and contact the traveller for next steps.'"
+        }
+      ],
+      "pass_count": 3,
+      "total_count": 3,
+      "pass_rate": 1.0,
+      "total_inference_time_s": 0.2445,
+      "total_runtime_s": 6.3211,
+      "error": null,
+      "status": "ok",
+      "problem_name": "Information Retrieval",
+      "technique_name": "Dense bi-encoder retrieval",
+      "application_name": "Retrieve luxury-retail SOP passages for staff questions using semantic embeddings.",
+      "comparison_group": "sop_retrieval",
+      "runtime_tier": "medium",
+      "primary_metric": "pass_rate",
+      "metrics": {
+        "pass_rate": 1.0
+      },
+      "completed_at": null
+    },
+    {
+      "use_case_id": "12_fewshot_email_department",
+      "type": "information_retrieval",
+      "description": "Retrieve luxury-retail SOP passages by reranking lexical candidates with a local cross-encoder.",
+      "domain_relevance": "This shows the accuracy tradeoff when a slower but stronger local reranker is added after lexical retrieval.",
+      "model": "cross-encoder/ms-marco-MiniLM-L6-v2",
+      "library": "sentence-transformers",
+      "model_load_time_s": 4.3751,
+      "test_cases": [
+        {
+          "input": "Can a traveller return an unopened perfume without the original receipt?",
+          "expected": "sop_returns_unopened",
+          "actual": "sop_returns_unopened",
+          "passed": true,
+          "inference_time_s": 0.1914,
+          "notes": "rerank_scores=[sop_returns_unopened:4.955, sop_missed_collection:-7.933, sop_opened_cosmetics:-6.974] top_k=3"
+        },
+        {
+          "input": "What should staff do when a luxury watch authenticity card is missing?",
+          "expected": "sop_authenticity_card",
+          "actual": "sop_authenticity_card",
+          "passed": true,
+          "inference_time_s": 0.0832,
+          "notes": "rerank_scores=[sop_authenticity_card:8.438, sop_repair_watch:-2.847, sop_damaged_packaging:-4.123] top_k=3"
+        },
+        {
+          "input": "Can an airport preorder be collected after the passenger's flight departs?",
+          "expected": "sop_missed_collection",
+          "actual": "sop_missed_collection",
+          "passed": true,
+          "inference_time_s": 0.0602,
+          "notes": "rerank_scores=[sop_missed_collection:4.449, sop_returns_unopened:-9.752, sop_authenticity_card:-11.021] top_k=3"
+        }
+      ],
+      "pass_count": 3,
+      "total_count": 3,
+      "pass_rate": 1.0,
+      "total_inference_time_s": 0.3348,
+      "total_runtime_s": 4.7099,
+      "error": null,
+      "status": "ok",
+      "problem_name": "Information Retrieval",
+      "technique_name": "Cross-encoder reranking",
+      "application_name": "Retrieve luxury-retail SOP passages by reranking lexical candidates with a local cross-encoder.",
+      "comparison_group": "sop_retrieval",
+      "runtime_tier": "medium",
+      "primary_metric": "pass_rate",
+      "metrics": {
+        "pass_rate": 1.0
+      },
+      "completed_at": null
+    },
+    {
+      "use_case_id": "13_fewshot_supplier_urgency",
+      "type": "extractive_qa",
+      "description": "Extract exact answers from luxury-retail policy passages.",
+      "domain_relevance": "Staff often need the exact rule from a policy, not just a similar document match.",
+      "model": "deepset/tinyroberta-squad2",
+      "library": "transformers",
+      "model_load_time_s": 1.9127,
+      "test_cases": [
+        {
+          "input": "How many days can unopened fragrance be returned?",
+          "expected": "14 days",
+          "actual": "14",
+          "passed": false,
+          "inference_time_s": 0.1182,
+          "notes": "start_idx=29 end_idx=29 context_length=207"
+        },
+        {
+          "input": "What must staff verify when the authenticity card is missing?",
+          "expected": "the serial number",
+          "actual": "the serial number",
+          "passed": true,
+          "inference_time_s": 0.0498,
+          "notes": "start_idx=29 end_idx=31 context_length=180"
+        },
+        {
+          "input": "Are opened cosmetics eligible for return?",
+          "expected": "not eligible for return",
+          "actual": "not eligible for return unless a product defect is confirmed by the boutique manager",
+          "passed": false,
+          "inference_time_s": 0.0552,
+          "notes": "start_idx=23 end_idx=36 context_length=148"
+        }
+      ],
+      "pass_count": 1,
+      "total_count": 3,
+      "pass_rate": 0.3333,
+      "total_inference_time_s": 0.2232,
+      "total_runtime_s": 2.1359,
+      "error": null,
+      "status": "ok",
+      "problem_name": "Extractive Question Answering",
+      "technique_name": "Transformer span extraction",
+      "application_name": "Extract exact policy answers from luxury-retail SOP text.",
+      "comparison_group": "extractive_question_answering",
+      "runtime_tier": "medium",
+      "primary_metric": "exact_match",
+      "metrics": {
+        "pass_rate": 0.3333
+      },
+      "completed_at": null
+    },
+    {
+      "use_case_id": "14_fewshot_feedback_topic",
+      "type": "information_extraction",
+      "description": "Parse luxury-retail receipt and stock-transfer text with deterministic rules.",
+      "domain_relevance": "Many operational text formats are regular enough that local parsing beats heavier models on speed and reliability.",
+      "model": "curated_regex_parser_v1",
+      "library": "custom",
+      "model_load_time_s": 0.0,
+      "test_cases": [
+        {
+          "input": "Transfer 6 x SKU CH-8841 at SGD 2450 from T1 boutique to T3 collection desk.",
+          "expected": {
+            "quantity": 6,
+            "sku": "CH-8841",
+            "currency": "SGD",
+            "price": 2450,
+            "from_location": "T1 boutique",
+            "to_location": "T3 collection desk"
+          },
+          "actual": {
+            "quantity": 6,
+            "sku": "CH-8841",
+            "currency": "SGD",
+            "price": 2450,
+            "from_location": "T1 boutique",
+            "to_location": "T3 collection desk"
+          },
+          "passed": true,
+          "inference_time_s": 0.0003,
+          "notes": "field_count=6"
+        },
+        {
+          "input": "Receipt HKG-92817: 2 Dior fragrances, total HKD 2180.",
+          "expected": {
+            "receipt_id": "HKG-92817",
+            "quantity": 2,
+            "product": "Dior fragrances",
+            "currency": "HKD",
+            "total": 2180
+          },
+          "actual": {
+            "receipt_id": "HKG-92817",
+            "quantity": 2,
+            "product": "Dior fragrances",
+            "currency": "HKD",
+            "total": 2180
+          },
+          "passed": true,
+          "inference_time_s": 0.0002,
+          "notes": "field_count=5"
+        },
+        {
+          "input": "Received 11 of 12 Macallan 18 700ml bottles at Changi stockroom.",
+          "expected": {
+            "received_quantity": 11,
+            "expected_quantity": 12,
+            "product": "Macallan 18 700ml bottles",
+            "location": "Changi stockroom"
+          },
+          "actual": {
+            "received_quantity": 11,
+            "expected_quantity": 12,
+            "product": "Macallan 18 700ml bottles",
+            "location": "Changi stockroom"
+          },
+          "passed": true,
+          "inference_time_s": 0.0001,
+          "notes": "field_count=4"
+        }
+      ],
+      "pass_count": 3,
+      "total_count": 3,
+      "pass_rate": 1.0,
+      "total_inference_time_s": 0.0006,
+      "total_runtime_s": 0.0006,
+      "error": null,
+      "status": "ok",
+      "problem_name": "Template-Based Information Extraction",
+      "technique_name": "Regular expressions and deterministic parsing",
+      "application_name": "Parse luxury-retail receipt and stock-transfer text into structured fields.",
+      "comparison_group": "template_information_extraction",
+      "runtime_tier": "fast",
+      "primary_metric": "pass_rate",
+      "metrics": {
+        "pass_rate": 1.0
+      },
+      "completed_at": null
+    },
+    {
+      "use_case_id": "15_entity_resolution_fuzzy",
+      "type": "entity_resolution",
+      "description": "Resolve informal luxury-retail product names with fuzzy string matching.",
+      "domain_relevance": "This provides a lightweight baseline for catalogue normalization without embeddings.",
+      "model": "curated_fuzzy_matcher_v1",
+      "library": "custom",
+      "model_load_time_s": 0.0,
+      "test_cases": [
+        {
+          "input": "JW Blue 1 litre",
+          "expected": "JW-BLUE-1L",
+          "actual": "JW-BLUE-1L",
+          "passed": true,
+          "inference_time_s": 0.0007,
+          "notes": "top_matches=[JW-BLUE-1L:0.4255, CART-TANK-L:0.2564, LV-KEEPALL-50:0.2564]"
+        },
+        {
+          "input": "Johnnie Walker Blue Label 1000ml",
+          "expected": "JW-BLUE-1L",
+          "actual": "JW-BLUE-1L",
+          "passed": true,
+          "inference_time_s": 0.0004,
+          "notes": "top_matches=[JW-BLUE-1L:1.0, MAC-18-700:0.3793, DIOR-SADDLE-BLK:0.3019]"
+        },
+        {
+          "input": "Jonnie Walker Blu 1L",
+          "expected": "JW-BLUE-1L",
+          "actual": "JW-BLUE-1L",
+          "passed": true,
+          "inference_time_s": 0.0003,
+          "notes": "top_matches=[JW-BLUE-1L:0.7692, MAC-18-700:0.3478, DIOR-SADDLE-BLK:0.3415]"
+        }
+      ],
+      "pass_count": 3,
+      "total_count": 3,
+      "pass_rate": 1.0,
+      "total_inference_time_s": 0.0014,
+      "total_runtime_s": 0.0014,
+      "error": null,
+      "status": "ok",
+      "problem_name": "Entity Resolution",
+      "technique_name": "String normalization and fuzzy matching",
+      "application_name": "Resolve informal luxury-retail product names to canonical catalogue SKUs.",
+      "comparison_group": "entity_resolution",
+      "runtime_tier": "fast",
+      "primary_metric": "pass_rate",
+      "metrics": {
+        "pass_rate": 1.0
+      },
+      "completed_at": null
+    },
+    {
+      "use_case_id": "16_entity_resolution_dense",
+      "type": "entity_resolution",
+      "description": "Resolve informal luxury-retail product names with dense catalogue matching.",
+      "domain_relevance": "This measures whether embeddings improve robustness for aliases, abbreviations, and misspellings.",
+      "model": "sentence-transformers/all-mpnet-base-v2",
+      "library": "sentence-transformers",
+      "model_load_time_s": 5.7679,
+      "test_cases": [
+        {
+          "input": "JW Blue 1 litre",
+          "expected": "JW-BLUE-1L",
+          "actual": "JW-BLUE-1L",
+          "passed": true,
+          "inference_time_s": 0.0613,
+          "notes": "sample_scores=[JW-BLUE-1L:0.685, MAC-18-700:0.491, DIOR-SADDLE-BLK:0.337]"
+        },
+        {
+          "input": "Johnnie Walker Blue Label 1000ml",
+          "expected": "JW-BLUE-1L",
+          "actual": "JW-BLUE-1L",
+          "passed": true,
+          "inference_time_s": 0.0619,
+          "notes": "sample_scores=[JW-BLUE-1L:1.0, MAC-18-700:0.593, DIOR-SADDLE-BLK:0.276]"
+        },
+        {
+          "input": "Jonnie Walker Blu 1L",
+          "expected": "JW-BLUE-1L",
+          "actual": "JW-BLUE-1L",
+          "passed": true,
+          "inference_time_s": 0.065,
+          "notes": "sample_scores=[JW-BLUE-1L:0.577, MAC-18-700:0.422, DIOR-SADDLE-BLK:0.39]"
+        }
+      ],
+      "pass_count": 3,
+      "total_count": 3,
+      "pass_rate": 1.0,
+      "total_inference_time_s": 0.1882,
+      "total_runtime_s": 5.9561,
+      "error": null,
+      "status": "ok",
+      "problem_name": "Entity Resolution",
+      "technique_name": "Dense catalogue matching",
+      "application_name": "Resolve informal luxury-retail product names to canonical catalogue SKUs with embeddings.",
+      "comparison_group": "entity_resolution",
+      "runtime_tier": "medium",
+      "primary_metric": "pass_rate",
+      "metrics": {
+        "pass_rate": 1.0
+      },
+      "completed_at": null
+    },
+    {
+      "use_case_id": "17_natural_language_inference",
+      "type": "natural_language_inference",
+      "description": "Classify luxury-retail promotion report pairs as entailment, neutral, or contradiction.",
+      "domain_relevance": "Compliance checks often depend on whether a store report confirms, omits, or contradicts the campaign brief.",
+      "model": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
+      "library": "transformers",
+      "model_load_time_s": 3.2581,
+      "test_cases": [
+        {
+          "input": {
+            "premise": "The May airport campaign brief states that every Dior handbag display must include the gold podium stand and the airport-exclusive signage.",
+            "hypothesis": "The Dior handbag display includes the required podium stand and airport-exclusive signage."
+          },
+          "expected": "entailment",
+          "actual": "entailment",
+          "passed": true,
+          "inference_time_s": 1.8942,
+          "notes": "class_probs=[entailment:0.85, neutral:0.132, contradiction:0.019]"
+        },
+        {
+          "input": {
+            "premise": "The store report notes that the Dior handbag display was assembled before opening, but it does not mention the podium stand or signage.",
+            "hypothesis": "The Dior handbag display includes the required podium stand and airport-exclusive signage."
+          },
+          "expected": "neutral",
+          "actual": "contradiction",
+          "passed": false,
+          "inference_time_s": 1.8077,
+          "notes": "class_probs=[entailment:0.0, neutral:0.038, contradiction:0.961]"
+        },
+        {
+          "input": {
+            "premise": "The evening audit recorded that the Dior handbag display used a silver shelf and omitted the airport-exclusive signage due to missing stock.",
+            "hypothesis": "The Dior handbag display includes the required podium stand and airport-exclusive signage."
+          },
+          "expected": "contradiction",
+          "actual": "contradiction",
+          "passed": true,
+          "inference_time_s": 1.7813,
+          "notes": "class_probs=[entailment:0.0, neutral:0.001, contradiction:0.999]"
+        }
+      ],
+      "pass_count": 2,
+      "total_count": 3,
+      "pass_rate": 0.6667,
+      "total_inference_time_s": 5.4832,
+      "total_runtime_s": 8.7413,
+      "error": null,
+      "status": "ok",
+      "problem_name": "Natural Language Inference",
+      "technique_name": "Three-way NLI classification",
+      "application_name": "Verify luxury-retail promotion compliance reports for entailment, neutrality, or contradiction.",
+      "comparison_group": "natural_language_inference",
+      "runtime_tier": "medium",
+      "primary_metric": "pass_rate",
+      "metrics": {
+        "pass_rate": 0.6667
+      },
+      "completed_at": null
+    },
+    {
+      "use_case_id": "18_extractive_summarization",
+      "type": "extractive_summarization",
+      "description": "Select the key sentences from luxury-retail handover notes.",
+      "domain_relevance": "Operations teams often need a concise handover without generating new text.",
+      "model": "curated_sentence_ranker_v1",
+      "library": "custom",
+      "model_load_time_s": 0.0,
+      "test_cases": [
+        {
+          "input": "Morning handover. The fragrance gondola was refilled before opening. A VIP traveller will collect a Cartier watch at 14:00 and customer service has been informed. The terminal manager requested a photo of the refreshed display.",
+          "expected": [
+            "A VIP traveller will collect a Cartier watch at 14:00 and customer service has been informed.",
+            "The terminal manager requested a photo of the refreshed display."
+          ],
+          "actual": [
+            "A VIP traveller will collect a Cartier watch at 14:00 and customer service has been informed.",
+            "Morning handover."
+          ],
+          "passed": false,
+          "inference_time_s": 0.0002,
+          "notes": "selected_sentence_count=2"
+        },
+        {
+          "input": "Afternoon handover. The Dior preorder was not ready when the traveller arrived and customer service promised an update. The engraving machine remains offline and engineering will review it tomorrow morning. A replacement gift box was issued for a damaged cosmetics purchase.",
+          "expected": [
+            "The Dior preorder was not ready when the traveller arrived and customer service promised an update.",
+            "The engraving machine remains offline and engineering will review it tomorrow morning."
+          ],
+          "actual": [
+            "The Dior preorder was not ready when the traveller arrived and customer service promised an update.",
+            "The engraving machine remains offline and engineering will review it tomorrow morning."
+          ],
+          "passed": true,
+          "inference_time_s": 0.0,
+          "notes": "selected_sentence_count=2"
+        },
+        {
+          "input": "Closing handover. Security could not account for one diamond bracelet after final count and the CCTV review has been escalated. The duty manager locked the jewellery cabinet and paused all bracelet sales. Housekeeping completed the standard boutique cleaning schedule.",
+          "expected": [
+            "Security could not account for one diamond bracelet after final count and the CCTV review has been escalated.",
+            "The duty manager locked the jewellery cabinet and paused all bracelet sales."
+          ],
+          "actual": [
+            "Security could not account for one diamond bracelet after final count and the CCTV review has been escalated.",
+            "The duty manager locked the jewellery cabinet and paused all bracelet sales."
+          ],
+          "passed": true,
+          "inference_time_s": 0.0,
+          "notes": "selected_sentence_count=2"
+        }
+      ],
+      "pass_count": 2,
+      "total_count": 3,
+      "pass_rate": 0.6667,
+      "total_inference_time_s": 0.0002,
+      "total_runtime_s": 0.0002,
+      "error": null,
+      "status": "ok",
+      "problem_name": "Extractive Summarization",
+      "technique_name": "Sentence ranking",
+      "application_name": "Select the most important sentences from luxury-retail handover notes.",
+      "comparison_group": "extractive_summarization",
+      "runtime_tier": "fast",
+      "primary_metric": "pass_rate",
+      "metrics": {
+        "pass_rate": 0.6667
+      },
+      "completed_at": null
+    },
+    {
+      "use_case_id": "19_optical_character_recognition",
+      "type": "optical_character_recognition",
+      "description": "Read compact receipt and pickup text from generated luxury-retail image fixtures.",
+      "domain_relevance": "Receipt-like images are a realistic extension of offline retail workflows beyond plain text.",
+      "model": "microsoft/trocr-small-printed",
+      "library": "transformers",
+      "model_load_time_s": 4.8631,
+      "test_cases": [
+        {
+          "input": "receipt_01.png",
+          "expected": "RECEIPT T1-8841 TOTAL SGD 2450",
+          "actual": "RECEIPT T-18841 TOTAL S60 24550",
+          "passed": false,
+          "inference_time_s": 1.0809,
+          "notes": "image_size=1200x220"
+        },
+        {
+          "input": "receipt_02.png",
+          "expected": "RECEIPT HKG-92817 TOTAL HKD 2180",
+          "actual": "RECEIPT HKG-92817 TOTAL HKD 2180",
+          "passed": true,
+          "inference_time_s": 0.8635,
+          "notes": "image_size=1200x220"
+        },
+        {
+          "input": "receipt_03.png",
+          "expected": "PICKUP ORDER VIP-331 GATE C3",
+          "actual": "PICKUP ORDER VIP-331 GATE CO",
+          "passed": false,
+          "inference_time_s": 0.6451,
+          "notes": "image_size=1200x220"
+        }
+      ],
+      "pass_count": 1,
+      "total_count": 3,
+      "pass_rate": 0.3333,
+      "total_inference_time_s": 2.5895,
+      "total_runtime_s": 7.4526,
+      "error": null,
+      "status": "ok",
+      "problem_name": "Optical Character Recognition",
+      "technique_name": "Transformer OCR",
+      "application_name": "Read compact luxury-retail receipt and pickup text from generated images.",
+      "comparison_group": "optical_character_recognition",
+      "runtime_tier": "heavy",
+      "primary_metric": "pass_rate",
+      "metrics": {
+        "pass_rate": 0.3333
+      },
+      "completed_at": null
+    }
+  ],
+  "summary": {
+    "total_use_cases": 19,
+    "successful_use_cases": 19,
+    "total_test_cases": 57,
+    "total_passed": 47,
+    "overall_pass_rate": 0.8246
+  }
+}

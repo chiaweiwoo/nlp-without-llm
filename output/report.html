@@ -1,0 +1,3031 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NLP Offline Study Report</title>
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --text-color: #1e293b;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --primary: #4f46e5;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --amber: #d97706;
+            --muted: #64748b;
+        }
+
+        body {
+            font-family: "Segoe UI", system-ui, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .app-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background-color: #0f172a;
+            color: #f8fafc;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            padding: 1.5rem 1rem;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+
+        .sidebar-header h2 {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: #94a3b8;
+            margin: 0 0 1.25rem 0.75rem;
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .nav-link {
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 0.825rem;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background-color: var(--primary);
+            color: #ffffff;
+        }
+
+        .nav-section-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #475569;
+            margin: 1.25rem 0 0.5rem 0.75rem;
+            font-weight: 700;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 2.5rem 2rem;
+            box-sizing: border-box;
+        }
+
+        .container {
+            max-width: 1080px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 1.5rem;
+        }
+
+        h1 {
+            margin: 0 0 0.5rem 0;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .meta-info {
+            font-size: 0.85rem;
+            color: var(--muted);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-card,
+        .card,
+        .use-case-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .summary-card {
+            padding: 1.25rem;
+        }
+
+        .summary-card .label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--muted);
+            font-weight: 600;
+        }
+
+        .summary-card .value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-top: 0.25rem;
+        }
+
+        .card {
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .card-header {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border-color);
+            background-color: #f1f5f9;
+        }
+
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.82rem;
+            table-layout: fixed;
+        }
+
+        th,
+        td {
+            padding: 0.7rem 0.55rem;
+            border-bottom: 1px solid var(--border-color);
+            text-align: left;
+            vertical-align: top;
+            overflow-wrap: break-word;
+        }
+
+        th {
+            background-color: #f8fafc;
+            color: var(--muted);
+            text-transform: uppercase;
+            font-size: 0.725rem;
+            letter-spacing: 0.05em;
+        }
+
+        .use-cases-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .use-case-card {
+            overflow: hidden;
+            scroll-margin-top: 1rem;
+        }
+
+        .use-case-header {
+            padding: 1rem 1.25rem;
+            background-color: #f8fafc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .use-case-content {
+            padding: 1.25rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 0.9rem;
+        }
+
+        .collapse-icon {
+            color: var(--muted);
+        }
+
+        .metadata-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .metadata-grid p {
+            margin: 0.25rem 0 0 0;
+            color: #475569;
+            font-size: 0.85rem;
+        }
+
+        .metrics-box {
+            background-color: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 0.375rem;
+            padding: 0.85rem 1rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .metrics-box ul {
+            margin: 0.5rem 0 0 1rem;
+            padding: 0;
+        }
+
+        .code-info-container {
+            position: relative;
+            display: inline-block;
+            margin-top: 0.55rem;
+        }
+
+        .info-icon-badge {
+            background-color: #eef2ff;
+            color: #4338ca;
+            border: 1px dashed #c7d2fe;
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 0.18rem 0.45rem;
+            border-radius: 0.25rem;
+            cursor: default;
+        }
+
+        .code-tooltip {
+            display: none;
+            position: absolute;
+            top: 125%;
+            left: 0;
+            background-color: #0f172a;
+            color: #e2e8f0;
+            border: 1px solid #334155;
+            border-radius: 0.5rem;
+            padding: 0.8rem 0.9rem;
+            width: 360px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
+            z-index: 20;
+        }
+
+        .code-info-container:hover .code-tooltip {
+            display: block;
+        }
+
+        .code-tooltip strong {
+            display: block;
+            margin-top: 0.4rem;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #cbd5e1;
+        }
+
+        .code-tooltip strong:first-child {
+            margin-top: 0;
+        }
+
+        .code-tooltip pre {
+            white-space: pre-wrap;
+            word-break: break-word;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
+            font-size: 0.72rem;
+            margin: 0.25rem 0 0 0;
+            color: #f8fafc;
+        }
+
+        .type-badge-inline {
+            background-color: #e0e7ff;
+            color: #4338ca;
+            font-size: 0.725rem;
+            padding: 0.2rem 0.45rem;
+            border-radius: 0.25rem;
+            font-weight: 500;
+        }
+
+        .status-badge {
+            font-size: 0.725rem;
+            font-weight: 700;
+            padding: 0.3rem 0.65rem;
+            border-radius: 9999px;
+            letter-spacing: 0.05em;
+        }
+
+        .badge-pass {
+            background-color: #dcfce7;
+            color: #15803d;
+        }
+
+        .badge-amber {
+            background-color: #fef3c7;
+            color: #b45309;
+        }
+
+        .badge-fail {
+            background-color: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .status-tag {
+            font-size: 0.725rem;
+            font-weight: 600;
+            padding: 0.15rem 0.45rem;
+            border-radius: 0.25rem;
+        }
+
+        .pass-tag {
+            background-color: #dcfce7;
+            color: #16a34a;
+        }
+
+        .fail-tag {
+            background-color: #fee2e2;
+            color: #dc2626;
+        }
+
+        .pass-text {
+            color: var(--success);
+        }
+
+        .amber-text {
+            color: var(--amber);
+        }
+
+        .fail-text {
+            color: var(--danger);
+        }
+
+        .font-bold {
+            font-weight: 700;
+        }
+
+        .mono {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
+            font-size: 0.75rem;
+        }
+
+        .col-small {
+            width: 3.5%;
+        }
+
+        .col-use-case {
+            width: 12%;
+        }
+
+        .col-problem {
+            width: 11%;
+        }
+
+        .col-technique {
+            width: 12%;
+        }
+
+        .col-tier {
+            width: 5%;
+        }
+
+        .col-model {
+            width: 31%;
+            overflow-wrap: anywhere;
+        }
+
+        .col-metric {
+            width: 6.5%;
+            white-space: nowrap;
+        }
+
+        .notes-cell {
+            font-size: 0.775rem;
+            color: var(--muted);
+        }
+
+        .error-box {
+            background-color: #fef2f2;
+            border: 1px solid #fee2e2;
+            border-left: 4px solid var(--danger);
+            padding: 1rem;
+            border-radius: 0.375rem;
+            margin-bottom: 1rem;
+            color: #991b1b;
+        }
+
+        .error-box pre {
+            white-space: pre-wrap;
+            word-break: break-word;
+            margin: 0.5rem 0 0 0;
+        }
+
+        footer {
+            color: var(--muted);
+            font-size: 0.85rem;
+            margin: 2rem 0 1rem 0;
+        }
+
+        @media (max-width: 960px) {
+            .sidebar {
+                position: static;
+                width: 100%;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 1.5rem 1rem;
+            }
+
+            .app-layout {
+                display: block;
+            }
+        }
+    </style>
+    <script>
+        function toggleCard(ucId) {
+            const content = document.getElementById(`content-${ucId}`);
+            const icon = document.getElementById(`icon-${ucId}`);
+            if (!content || !icon) return;
+            const isHidden = content.style.display === "none";
+            content.style.display = isHidden ? "block" : "none";
+            icon.innerHTML = isHidden ? "&#9660;" : "&#9658;";
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            document.querySelectorAll(".nav-link").forEach((link) => {
+                link.addEventListener("click", (event) => {
+                    event.preventDefault();
+                    const target = document.querySelector(link.getAttribute("href"));
+                    if (!target) return;
+                    target.scrollIntoView({ behavior: "smooth" });
+                    document.querySelectorAll(".nav-link").forEach((node) => node.classList.remove("active"));
+                    link.classList.add("active");
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="app-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Offline Study</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#header-section" class="nav-link active"><span>Overview</span></a>
+                <a href="#summary-section" class="nav-link"><span>Summary Metrics</span></a>
+                <a href="#comparison-section" class="nav-link"><span>Comparison Table</span></a>
+                <div class="nav-section-title">Studies</div>
+                
+        <a href="#card-01_language_detection" class="nav-link">
+            <span>01_language_detection</span>
+            <span class="status-dot badge-pass"></span>
+        </a>
+        
+        <a href="#card-02_translate_zh_en" class="nav-link">
+            <span>02_translate_zh_en</span>
+            <span class="status-dot badge-pass"></span>
+        </a>
+        
+        <a href="#card-03_sentiment_customer_review" class="nav-link">
+            <span>03_sentiment_customer_review</span>
+            <span class="status-dot badge-pass"></span>
+        </a>
+        
+        <a href="#card-04_sentiment_internal_escalation" class="nav-link">
+            <span>04_sentiment_internal_escalation</span>
+            <span class="status-dot badge-pass"></span>
+        </a>
+        
+        <a href="#card-05_ner_brands_locations" class="nav-link">
+            <span>05_ner_brands_locations</span>
+            <span class="status-dot badge-pass"></span>
+        </a>
+        
+        <a href="#card-06_ner_people_orgs_procurement" class="nav-link">
+            <span>06_ner_people_orgs_procurement</span>
+            <span class="status-dot badge-pass"></span>
+        </a>
+        
+        <a href="#card-07_classify_email_department" class="nav-link">
+            <span>07_classify_email_department</span>
+            <span class="status-dot badge-pass"></span>
+        </a>
+        
+        <a href="#card-08_classify_supplier_urgency" class="nav-link">
+            <span>08_classify_supplier_urgency</span>
+            <span class="status-dot badge-pass"></span>
+        </a>
+        
+        <a href="#card-09_classify_feedback_topic" class="nav-link">
+            <span>09_classify_feedback_topic</span>
+            <span class="status-dot badge-pass"></span>
+        </a>
+        
+        <a href="#card-10_similarity_complaint_lookup" class="nav-link">
+            <span>10_similarity_complaint_lookup</span>
+            <span class="status-dot badge-pass"></span>
+        </a>
+        
+        <a href="#card-11_similarity_sop_retrieval" class="nav-link">
+            <span>11_similarity_sop_retrieval</span>
+            <span class="status-dot badge-pass"></span>
+        </a>
+        
+        <a href="#card-12_fewshot_email_department" class="nav-link">
+            <span>12_fewshot_email_department</span>
+            <span class="status-dot badge-pass"></span>
+        </a>
+        
+        <a href="#card-13_fewshot_supplier_urgency" class="nav-link">
+            <span>13_fewshot_supplier_urgency</span>
+            <span class="status-dot badge-amber"></span>
+        </a>
+        
+        <a href="#card-14_fewshot_feedback_topic" class="nav-link">
+            <span>14_fewshot_feedback_topic</span>
+            <span class="status-dot badge-pass"></span>
+        </a>
+        
+        <a href="#card-15_entity_resolution_fuzzy" class="nav-link">
+            <span>15_entity_resolution_fuzzy</span>
+            <span class="status-dot badge-pass"></span>
+        </a>
+        
+        <a href="#card-16_entity_resolution_dense" class="nav-link">
+            <span>16_entity_resolution_dense</span>
+            <span class="status-dot badge-pass"></span>
+        </a>
+        
+        <a href="#card-17_natural_language_inference" class="nav-link">
+            <span>17_natural_language_inference</span>
+            <span class="status-dot badge-pass"></span>
+        </a>
+        
+        <a href="#card-18_extractive_summarization" class="nav-link">
+            <span>18_extractive_summarization</span>
+            <span class="status-dot badge-pass"></span>
+        </a>
+        
+        <a href="#card-19_optical_character_recognition" class="nav-link">
+            <span>19_optical_character_recognition</span>
+            <span class="status-dot badge-amber"></span>
+        </a>
+        
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="container">
+                <section id="header-section">
+                    <header>
+                        <h1>Offline NLP Study Report</h1>
+                        <div class="meta-info">
+                            <span>Started: <strong>2026-06-11T18:25:45.433856Z</strong></span>
+                            <span>Finished: <strong>2026-06-11T18:25:45.433856Z</strong></span>
+                            <span>Total Wall Time: <strong>0.00s</strong></span>
+                            <span>Host OS: <strong>Windows-11</strong></span>
+                            <span>Python: <strong>3.13.13</strong></span>
+                        </div>
+                    </header>
+                </section>
+                <section id="summary-section">
+                    <div class="summary-grid">
+                        <div class="summary-card">
+                            <div class="label">Total Studies</div>
+                            <div class="value">19</div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="label">Successful Runs</div>
+                            <div class="value">19</div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="label">Total Examples</div>
+                            <div class="value">57</div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="label">Overall Pass Rate</div>
+                            <div class="value">82.46%</div>
+                        </div>
+                    </div>
+                </section>
+                <section id="comparison-section">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Problem / Technique Comparison</h2>
+                        </div>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Use Case</th>
+                                        <th>Problem</th>
+                                        <th>Technique</th>
+                                        <th>Tier</th>
+                                        <th>Model</th>
+                                        <th>Load</th>
+                                        <th>Avg Inference</th>
+                                        <th>Pass Rate</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    
+        <tr>
+            <td class="col-small">1</td>
+            <td class="col-use-case"><strong>01_language_detection</strong></td>
+            <td class="col-problem">Language Identification</td>
+            <td class="col-technique">Transformer classification</td>
+            <td class="col-tier">fast</td>
+            <td class="mono col-model" title="papluca/xlm-roberta-base-language-detection">papluca/xlm-roberta-base-language-detection</td>
+            <td class="col-metric">5.071s</td>
+            <td class="col-metric">0.2871s</td>
+            <td class="col-metric pass-text font-bold">66.7%</td>
+        </tr>
+        
+        <tr>
+            <td class="col-small">2</td>
+            <td class="col-use-case"><strong>02_translate_zh_en</strong></td>
+            <td class="col-problem">Machine Translation</td>
+            <td class="col-technique">Encoder-decoder transformer</td>
+            <td class="col-tier">heavy</td>
+            <td class="mono col-model" title="facebook/nllb-200-distilled-600M">facebook/nllb-200-distilled-600M</td>
+            <td class="col-metric">11.375s</td>
+            <td class="col-metric">2.5369s</td>
+            <td class="col-metric pass-text font-bold">66.7%</td>
+        </tr>
+        
+        <tr>
+            <td class="col-small">3</td>
+            <td class="col-use-case"><strong>03_sentiment_customer_review</strong></td>
+            <td class="col-problem">Sentiment Analysis</td>
+            <td class="col-technique">Lexicon scoring</td>
+            <td class="col-tier">fast</td>
+            <td class="mono col-model" title="curated_luxury_retail_lexicon_v1">curated_luxury_retail_lexicon_v1</td>
+            <td class="col-metric">0.000s</td>
+            <td class="col-metric">0.0000s</td>
+            <td class="col-metric pass-text font-bold">100.0%</td>
+        </tr>
+        
+        <tr>
+            <td class="col-small">4</td>
+            <td class="col-use-case"><strong>04_sentiment_internal_escalation</strong></td>
+            <td class="col-problem">Sentiment Analysis</td>
+            <td class="col-technique">Transformer sequence classification</td>
+            <td class="col-tier">medium</td>
+            <td class="mono col-model" title="cardiffnlp/twitter-roberta-base-sentiment-latest">cardiffnlp/twitter-roberta-base-sentiment-latest</td>
+            <td class="col-metric">2.337s</td>
+            <td class="col-metric">0.2317s</td>
+            <td class="col-metric pass-text font-bold">100.0%</td>
+        </tr>
+        
+        <tr>
+            <td class="col-small">5</td>
+            <td class="col-use-case"><strong>05_ner_brands_locations</strong></td>
+            <td class="col-problem">Named Entity Recognition</td>
+            <td class="col-technique">Gazetteer and phrase matching</td>
+            <td class="col-tier">fast</td>
+            <td class="mono col-model" title="curated_luxury_retail_gazetteer_v1">curated_luxury_retail_gazetteer_v1</td>
+            <td class="col-metric">0.000s</td>
+            <td class="col-metric">0.0000s</td>
+            <td class="col-metric pass-text font-bold">100.0%</td>
+        </tr>
+        
+        <tr>
+            <td class="col-small">6</td>
+            <td class="col-use-case"><strong>06_ner_people_orgs_procurement</strong></td>
+            <td class="col-problem">Named Entity Recognition</td>
+            <td class="col-technique">Transformer token classification</td>
+            <td class="col-tier">medium</td>
+            <td class="mono col-model" title="dslim/bert-base-NER">dslim/bert-base-NER</td>
+            <td class="col-metric">1.905s</td>
+            <td class="col-metric">0.2120s</td>
+            <td class="col-metric pass-text font-bold">66.7%</td>
+        </tr>
+        
+        <tr>
+            <td class="col-small">7</td>
+            <td class="col-use-case"><strong>07_classify_email_department</strong></td>
+            <td class="col-problem">Multiclass Text Classification</td>
+            <td class="col-technique">Keyword rules</td>
+            <td class="col-tier">fast</td>
+            <td class="mono col-model" title="curated_luxury_retail_rules_v1">curated_luxury_retail_rules_v1</td>
+            <td class="col-metric">0.000s</td>
+            <td class="col-metric">0.0000s</td>
+            <td class="col-metric pass-text font-bold">100.0%</td>
+        </tr>
+        
+        <tr>
+            <td class="col-small">8</td>
+            <td class="col-use-case"><strong>08_classify_supplier_urgency</strong></td>
+            <td class="col-problem">Multiclass Text Classification</td>
+            <td class="col-technique">Zero-shot NLI classification</td>
+            <td class="col-tier">medium</td>
+            <td class="mono col-model" title="MoritzLaurer/deberta-v3-base-zeroshot-v2.0">MoritzLaurer/deberta-v3-base-zeroshot-v2.0</td>
+            <td class="col-metric">3.350s</td>
+            <td class="col-metric">5.3129s</td>
+            <td class="col-metric pass-text font-bold">66.7%</td>
+        </tr>
+        
+        <tr>
+            <td class="col-small">9</td>
+            <td class="col-use-case"><strong>09_classify_feedback_topic</strong></td>
+            <td class="col-problem">Multiclass Text Classification</td>
+            <td class="col-technique">Few-shot embedding prototypes</td>
+            <td class="col-tier">medium</td>
+            <td class="mono col-model" title="sentence-transformers/all-mpnet-base-v2">sentence-transformers/all-mpnet-base-v2</td>
+            <td class="col-metric">6.668s</td>
+            <td class="col-metric">0.1833s</td>
+            <td class="col-metric pass-text font-bold">100.0%</td>
+        </tr>
+        
+        <tr>
+            <td class="col-small">10</td>
+            <td class="col-use-case"><strong>10_similarity_complaint_lookup</strong></td>
+            <td class="col-problem">Information Retrieval</td>
+            <td class="col-technique">BM25 lexical retrieval</td>
+            <td class="col-tier">fast</td>
+            <td class="mono col-model" title="curated_bm25_retriever_v1">curated_bm25_retriever_v1</td>
+            <td class="col-metric">0.000s</td>
+            <td class="col-metric">0.0001s</td>
+            <td class="col-metric pass-text font-bold">100.0%</td>
+        </tr>
+        
+        <tr>
+            <td class="col-small">11</td>
+            <td class="col-use-case"><strong>11_similarity_sop_retrieval</strong></td>
+            <td class="col-problem">Information Retrieval</td>
+            <td class="col-technique">Dense bi-encoder retrieval</td>
+            <td class="col-tier">medium</td>
+            <td class="mono col-model" title="sentence-transformers/all-mpnet-base-v2">sentence-transformers/all-mpnet-base-v2</td>
+            <td class="col-metric">6.077s</td>
+            <td class="col-metric">0.0815s</td>
+            <td class="col-metric pass-text font-bold">100.0%</td>
+        </tr>
+        
+        <tr>
+            <td class="col-small">12</td>
+            <td class="col-use-case"><strong>12_fewshot_email_department</strong></td>
+            <td class="col-problem">Information Retrieval</td>
+            <td class="col-technique">Cross-encoder reranking</td>
+            <td class="col-tier">medium</td>
+            <td class="mono col-model" title="cross-encoder/ms-marco-MiniLM-L6-v2">cross-encoder/ms-marco-MiniLM-L6-v2</td>
+            <td class="col-metric">4.375s</td>
+            <td class="col-metric">0.1116s</td>
+            <td class="col-metric pass-text font-bold">100.0%</td>
+        </tr>
+        
+        <tr>
+            <td class="col-small">13</td>
+            <td class="col-use-case"><strong>13_fewshot_supplier_urgency</strong></td>
+            <td class="col-problem">Extractive Question Answering</td>
+            <td class="col-technique">Transformer span extraction</td>
+            <td class="col-tier">medium</td>
+            <td class="mono col-model" title="deepset/tinyroberta-squad2">deepset/tinyroberta-squad2</td>
+            <td class="col-metric">1.913s</td>
+            <td class="col-metric">0.0744s</td>
+            <td class="col-metric amber-text font-bold">33.3%</td>
+        </tr>
+        
+        <tr>
+            <td class="col-small">14</td>
+            <td class="col-use-case"><strong>14_fewshot_feedback_topic</strong></td>
+            <td class="col-problem">Template-Based Information Extraction</td>
+            <td class="col-technique">Regular expressions and deterministic parsing</td>
+            <td class="col-tier">fast</td>
+            <td class="mono col-model" title="curated_regex_parser_v1">curated_regex_parser_v1</td>
+            <td class="col-metric">0.000s</td>
+            <td class="col-metric">0.0002s</td>
+            <td class="col-metric pass-text font-bold">100.0%</td>
+        </tr>
+        
+        <tr>
+            <td class="col-small">15</td>
+            <td class="col-use-case"><strong>15_entity_resolution_fuzzy</strong></td>
+            <td class="col-problem">Entity Resolution</td>
+            <td class="col-technique">String normalization and fuzzy matching</td>
+            <td class="col-tier">fast</td>
+            <td class="mono col-model" title="curated_fuzzy_matcher_v1">curated_fuzzy_matcher_v1</td>
+            <td class="col-metric">0.000s</td>
+            <td class="col-metric">0.0005s</td>
+            <td class="col-metric pass-text font-bold">100.0%</td>
+        </tr>
+        
+        <tr>
+            <td class="col-small">16</td>
+            <td class="col-use-case"><strong>16_entity_resolution_dense</strong></td>
+            <td class="col-problem">Entity Resolution</td>
+            <td class="col-technique">Dense catalogue matching</td>
+            <td class="col-tier">medium</td>
+            <td class="mono col-model" title="sentence-transformers/all-mpnet-base-v2">sentence-transformers/all-mpnet-base-v2</td>
+            <td class="col-metric">5.768s</td>
+            <td class="col-metric">0.0627s</td>
+            <td class="col-metric pass-text font-bold">100.0%</td>
+        </tr>
+        
+        <tr>
+            <td class="col-small">17</td>
+            <td class="col-use-case"><strong>17_natural_language_inference</strong></td>
+            <td class="col-problem">Natural Language Inference</td>
+            <td class="col-technique">Three-way NLI classification</td>
+            <td class="col-tier">medium</td>
+            <td class="mono col-model" title="MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli">MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli</td>
+            <td class="col-metric">3.258s</td>
+            <td class="col-metric">1.8277s</td>
+            <td class="col-metric pass-text font-bold">66.7%</td>
+        </tr>
+        
+        <tr>
+            <td class="col-small">18</td>
+            <td class="col-use-case"><strong>18_extractive_summarization</strong></td>
+            <td class="col-problem">Extractive Summarization</td>
+            <td class="col-technique">Sentence ranking</td>
+            <td class="col-tier">fast</td>
+            <td class="mono col-model" title="curated_sentence_ranker_v1">curated_sentence_ranker_v1</td>
+            <td class="col-metric">0.000s</td>
+            <td class="col-metric">0.0001s</td>
+            <td class="col-metric pass-text font-bold">66.7%</td>
+        </tr>
+        
+        <tr>
+            <td class="col-small">19</td>
+            <td class="col-use-case"><strong>19_optical_character_recognition</strong></td>
+            <td class="col-problem">Optical Character Recognition</td>
+            <td class="col-technique">Transformer OCR</td>
+            <td class="col-tier">heavy</td>
+            <td class="mono col-model" title="microsoft/trocr-small-printed">microsoft/trocr-small-printed</td>
+            <td class="col-metric">4.863s</td>
+            <td class="col-metric">0.8632s</td>
+            <td class="col-metric amber-text font-bold">33.3%</td>
+        </tr>
+        
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+                <section id="details-section">
+                    <h2>Detailed Results</h2>
+                    <div class="use-cases-list">
+                        
+        <div class="use-case-card" id="card-01_language_detection">
+            <div class="use-case-header" onclick="toggleCard('01_language_detection')">
+                <div class="header-left">
+                    <span class="collapse-icon" id="icon-01_language_detection">&#9660;</span>
+                    <h3>01_language_detection</h3>
+                    <span class="type-badge-inline">Language Identification</span>
+                </div>
+                <span class="status-badge badge-pass">PASS (2/3)</span>
+            </div>
+            <div class="use-case-content" id="content-01_language_detection">
+                <div class="metadata-grid">
+                    <div>
+                        <strong>Problem</strong>
+                        <p>Language Identification</p>
+                    </div>
+                    <div>
+                        <strong>Technique</strong>
+                        <p>Transformer classification</p>
+                    </div>
+                    <div>
+                        <strong>Application</strong>
+                        <p>Identify the language of traveller enquiries for luxury-retail support triage.</p>
+                    </div>
+                    <div>
+                        <strong>Model &amp; Library</strong>
+                        <p class="mono">papluca/xlm-roberta-base-language-detection (transformers)</p>
+                        <div class="code-info-container">
+                            <span class="info-icon-badge">View Code &amp; Params</span>
+                            <div class="code-tooltip">
+                                <strong>Loader</strong>
+                                <pre>pipeline(&#x27;text-classification&#x27;, model=&#x27;papluca/xlm-roberta-base-language-detection&#x27;)</pre>
+                                <strong>Parameters</strong>
+                                <pre>labels inferred directly from model output</pre>
+                                <strong>Inference Call</strong>
+                                <pre>classifier(text)[0]</pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <strong>Runtime Tier</strong>
+                        <p>fast</p>
+                    </div>
+                    <div>
+                        <strong>Primary Metric</strong>
+                        <p>pass_rate</p>
+                    </div>
+                    <div>
+                        <strong>Performance</strong>
+                        <p>Load: 5.071s | Inference: 0.861s | Total: 5.932s</p>
+                    </div>
+                    <div>
+                        <strong>Completed At</strong>
+                        <p>N/A</p>
+                    </div>
+                </div>
+                <div class="metrics-box">
+                    <strong>Metrics</strong>
+                    <ul><li><strong>pass_rate:</strong> 0.6667</li></ul>
+                </div>
+                
+                <h4>Evaluation Examples</h4>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 5%">#</th>
+                                <th style="width: 35%">Input</th>
+                                <th style="width: 15%">Expected</th>
+                                <th style="width: 15%">Actual</th>
+                                <th style="width: 10%">Status</th>
+                                <th style="width: 10%">Time</th>
+                                <th style="width: 10%">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+            <tr>
+                <td>1</td>
+                <td title="这款限量版手袋在登机前可以领取吗？">这款限量版手袋在登机前可以领取吗？</td>
+                <td class="mono">&quot;zh&quot;</td>
+                <td class="mono">&quot;zh&quot;</td>
+                <td><span class="status-tag pass-tag">PASS</span></td>
+                <td>0.6977s</td>
+                <td class="notes-cell">raw_label=zh score=0.9908</td>
+            </tr>
+            
+            <tr>
+                <td>2</td>
+                <td title="Est-ce que cette montre est disponible au terminal 3 ?">Est-ce que cette montre est disponible au terminal 3 ?</td>
+                <td class="mono">&quot;fr&quot;</td>
+                <td class="mono">&quot;fr&quot;</td>
+                <td><span class="status-tag pass-tag">PASS</span></td>
+                <td>0.0873s</td>
+                <td class="notes-cell">raw_label=fr score=0.9939</td>
+            </tr>
+            
+            <tr>
+                <td>3</td>
+                <td title="이 향수는 면세 할인이 적용되나요?">이 향수는 면세 할인이 적용되나요?</td>
+                <td class="mono">&quot;ko&quot;</td>
+                <td class="mono">&quot;ja&quot;</td>
+                <td><span class="status-tag fail-tag">FAIL</span></td>
+                <td>0.0764s</td>
+                <td class="notes-cell">raw_label=ja score=0.5548</td>
+            </tr>
+            
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="use-case-card" id="card-02_translate_zh_en">
+            <div class="use-case-header" onclick="toggleCard('02_translate_zh_en')">
+                <div class="header-left">
+                    <span class="collapse-icon" id="icon-02_translate_zh_en">&#9660;</span>
+                    <h3>02_translate_zh_en</h3>
+                    <span class="type-badge-inline">Machine Translation</span>
+                </div>
+                <span class="status-badge badge-pass">PASS (2/3)</span>
+            </div>
+            <div class="use-case-content" id="content-02_translate_zh_en">
+                <div class="metadata-grid">
+                    <div>
+                        <strong>Problem</strong>
+                        <p>Machine Translation</p>
+                    </div>
+                    <div>
+                        <strong>Technique</strong>
+                        <p>Encoder-decoder transformer</p>
+                    </div>
+                    <div>
+                        <strong>Application</strong>
+                        <p>Translate Mandarin luxury-retail enquiries into English for boutique and airport staff.</p>
+                    </div>
+                    <div>
+                        <strong>Model &amp; Library</strong>
+                        <p class="mono">facebook/nllb-200-distilled-600M (transformers)</p>
+                        <div class="code-info-container">
+                            <span class="info-icon-badge">View Code &amp; Params</span>
+                            <div class="code-tooltip">
+                                <strong>Loader</strong>
+                                <pre>AutoTokenizer.from_pretrained(model, src_lang=&#x27;zho_Hans&#x27;)
+AutoModelForSeq2SeqLM.from_pretrained(model)
+SentenceTransformer(&#x27;all-mpnet-base-v2&#x27;)</pre>
+                                <strong>Parameters</strong>
+                                <pre>forced_bos_token_id=&#x27;eng_Latn&#x27;, cosine threshold &gt;= 0.65</pre>
+                                <strong>Inference Call</strong>
+                                <pre>model.generate(...)
+util.cos_sim(actual_embedding, expected_embedding)</pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <strong>Runtime Tier</strong>
+                        <p>heavy</p>
+                    </div>
+                    <div>
+                        <strong>Primary Metric</strong>
+                        <p>pass_rate</p>
+                    </div>
+                    <div>
+                        <strong>Performance</strong>
+                        <p>Load: 11.375s | Inference: 7.611s | Total: 18.986s</p>
+                    </div>
+                    <div>
+                        <strong>Completed At</strong>
+                        <p>N/A</p>
+                    </div>
+                </div>
+                <div class="metrics-box">
+                    <strong>Metrics</strong>
+                    <ul><li><strong>pass_rate:</strong> 0.6667</li></ul>
+                </div>
+                
+                <h4>Evaluation Examples</h4>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 5%">#</th>
+                                <th style="width: 35%">Input</th>
+                                <th style="width: 15%">Expected</th>
+                                <th style="width: 15%">Actual</th>
+                                <th style="width: 10%">Status</th>
+                                <th style="width: 10%">Time</th>
+                                <th style="width: 10%">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+            <tr>
+                <td>1</td>
+                <td title="这款手表有全球保修吗？">这款手表有全球保修吗？</td>
+                <td class="mono">&quot;Does this watch come with a global warranty?&quot;</td>
+                <td class="mono">&quot;Is this watch global warranty?&quot;</td>
+                <td><span class="status-tag pass-tag">PASS</span></td>
+                <td>3.3656s</td>
+                <td class="notes-cell">actual=&#x27;Is this watch global warranty?&#x27; cosine=0.9023</td>
+            </tr>
+            
+            <tr>
+                <td>2</td>
+                <td title="我可以在登机前领取预订的香水吗？">我可以在登机前领取预订的香水吗？</td>
+                <td class="mono">&quot;Can I collect the reserved perfume before boarding?&quot;</td>
+                <td class="mono">&quot;Can I get the booked perfume before boarding?&quot;</td>
+                <td><span class="status-tag pass-tag">PASS</span></td>
+                <td>2.2743s</td>
+                <td class="notes-cell">actual=&#x27;Can I get the booked perfume before boarding?&#x27; cosine=0.9005</td>
+            </tr>
+            
+            <tr>
+                <td>3</td>
+                <td title="这个包是机场限定款吗？">这个包是机场限定款吗？</td>
+                <td class="mono">&quot;Is this bag an airport-exclusive edition?&quot;</td>
+                <td class="mono">&quot;Is this a limited amount for the airport?&quot;</td>
+                <td><span class="status-tag fail-tag">FAIL</span></td>
+                <td>1.9709s</td>
+                <td class="notes-cell">actual=&#x27;Is this a limited amount for the airport?&#x27; cosine=0.5702</td>
+            </tr>
+            
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="use-case-card" id="card-03_sentiment_customer_review">
+            <div class="use-case-header" onclick="toggleCard('03_sentiment_customer_review')">
+                <div class="header-left">
+                    <span class="collapse-icon" id="icon-03_sentiment_customer_review">&#9660;</span>
+                    <h3>03_sentiment_customer_review</h3>
+                    <span class="type-badge-inline">Sentiment Analysis</span>
+                </div>
+                <span class="status-badge badge-pass">PASS (3/3)</span>
+            </div>
+            <div class="use-case-content" id="content-03_sentiment_customer_review">
+                <div class="metadata-grid">
+                    <div>
+                        <strong>Problem</strong>
+                        <p>Sentiment Analysis</p>
+                    </div>
+                    <div>
+                        <strong>Technique</strong>
+                        <p>Lexicon scoring</p>
+                    </div>
+                    <div>
+                        <strong>Application</strong>
+                        <p>Evaluate post-purchase luxury-retail reviews with a transparent lexicon baseline.</p>
+                    </div>
+                    <div>
+                        <strong>Model &amp; Library</strong>
+                        <p class="mono">curated_luxury_retail_lexicon_v1 (custom)</p>
+                        <div class="code-info-container">
+                            <span class="info-icon-badge">View Code &amp; Params</span>
+                            <div class="code-tooltip">
+                                <strong>Loader</strong>
+                                <pre>custom lexicon baseline</pre>
+                                <strong>Parameters</strong>
+                                <pre>positive_terms, negative_terms</pre>
+                                <strong>Inference Call</strong>
+                                <pre>lexicon_sentiment(text, positive_terms, negative_terms)</pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <strong>Runtime Tier</strong>
+                        <p>fast</p>
+                    </div>
+                    <div>
+                        <strong>Primary Metric</strong>
+                        <p>pass_rate</p>
+                    </div>
+                    <div>
+                        <strong>Performance</strong>
+                        <p>Load: 0.000s | Inference: 0.000s | Total: 0.000s</p>
+                    </div>
+                    <div>
+                        <strong>Completed At</strong>
+                        <p>N/A</p>
+                    </div>
+                </div>
+                <div class="metrics-box">
+                    <strong>Metrics</strong>
+                    <ul><li><strong>pass_rate:</strong> 1.0</li></ul>
+                </div>
+                
+                <h4>Evaluation Examples</h4>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 5%">#</th>
+                                <th style="width: 35%">Input</th>
+                                <th style="width: 15%">Expected</th>
+                                <th style="width: 15%">Actual</th>
+                                <th style="width: 10%">Status</th>
+                                <th style="width: 10%">Time</th>
+                                <th style="width: 10%">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+            <tr>
+                <td>1</td>
+                <td title="The beauty advisor explained the fragrance notes beautifully and wrapped everything with care.">The beauty advisor explained the fragrance notes beautifully and wrapped everything with care.</td>
+                <td class="mono">&quot;positive&quot;</td>
+                <td class="mono">&quot;positive&quot;</td>
+                <td><span class="status-tag pass-tag">PASS</span></td>
+                <td>0.0001s</td>
+                <td class="notes-cell">positive_hits=2 negative_hits=0 token_count=13</td>
+            </tr>
+            
+            <tr>
+                <td>2</td>
+                <td title="The boutique had the handbag in stock, but only in the black colourway.">The boutique had the handbag in stock, but only in the black colourway.</td>
+                <td class="mono">&quot;neutral&quot;</td>
+                <td class="mono">&quot;neutral&quot;</td>
+                <td><span class="status-tag pass-tag">PASS</span></td>
+                <td>0.0000s</td>
+                <td class="notes-cell">positive_hits=0 negative_hits=0 token_count=13</td>
+            </tr>
+            
+            <tr>
+                <td>3</td>
+                <td title="The perfume box was damaged and the staff refused to replace it before boarding.">The perfume box was damaged and the staff refused to replace it before boarding.</td>
+                <td class="mono">&quot;negative&quot;</td>
+                <td class="mono">&quot;negative&quot;</td>
+                <td><span class="status-tag pass-tag">PASS</span></td>
+                <td>0.0000s</td>
+                <td class="notes-cell">positive_hits=0 negative_hits=2 token_count=14</td>
+            </tr>
+            
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="use-case-card" id="card-04_sentiment_internal_escalation">
+            <div class="use-case-header" onclick="toggleCard('04_sentiment_internal_escalation')">
+                <div class="header-left">
+                    <span class="collapse-icon" id="icon-04_sentiment_internal_escalation">&#9660;</span>
+                    <h3>04_sentiment_internal_escalation</h3>
+                    <span class="type-badge-inline">Sentiment Analysis</span>
+                </div>
+                <span class="status-badge badge-pass">PASS (3/3)</span>
+            </div>
+            <div class="use-case-content" id="content-04_sentiment_internal_escalation">
+                <div class="metadata-grid">
+                    <div>
+                        <strong>Problem</strong>
+                        <p>Sentiment Analysis</p>
+                    </div>
+                    <div>
+                        <strong>Technique</strong>
+                        <p>Transformer sequence classification</p>
+                    </div>
+                    <div>
+                        <strong>Application</strong>
+                        <p>Evaluate post-purchase luxury-retail reviews with a pretrained transformer classifier.</p>
+                    </div>
+                    <div>
+                        <strong>Model &amp; Library</strong>
+                        <p class="mono">cardiffnlp/twitter-roberta-base-sentiment-latest (transformers)</p>
+                        <div class="code-info-container">
+                            <span class="info-icon-badge">View Code &amp; Params</span>
+                            <div class="code-tooltip">
+                                <strong>Loader</strong>
+                                <pre>pipeline(&#x27;sentiment-analysis&#x27;, model=&#x27;cardiffnlp/twitter-roberta-base-sentiment-latest&#x27;)</pre>
+                                <strong>Parameters</strong>
+                                <pre>normalize label to positive / neutral / negative</pre>
+                                <strong>Inference Call</strong>
+                                <pre>classifier(text)[0]</pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <strong>Runtime Tier</strong>
+                        <p>medium</p>
+                    </div>
+                    <div>
+                        <strong>Primary Metric</strong>
+                        <p>pass_rate</p>
+                    </div>
+                    <div>
+                        <strong>Performance</strong>
+                        <p>Load: 2.337s | Inference: 0.695s | Total: 3.032s</p>
+                    </div>
+                    <div>
+                        <strong>Completed At</strong>
+                        <p>N/A</p>
+                    </div>
+                </div>
+                <div class="metrics-box">
+                    <strong>Metrics</strong>
+                    <ul><li><strong>pass_rate:</strong> 1.0</li></ul>
+                </div>
+                
+                <h4>Evaluation Examples</h4>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 5%">#</th>
+                                <th style="width: 35%">Input</th>
+                                <th style="width: 15%">Expected</th>
+                                <th style="width: 15%">Actual</th>
+                                <th style="width: 10%">Status</th>
+                                <th style="width: 10%">Time</th>
+                                <th style="width: 10%">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+            <tr>
+                <td>1</td>
+                <td title="The beauty advisor explained the fragrance notes beautifully and wrapped everything with care.">The beauty advisor explained the fragrance notes beautifully and wrapped everything with care.</td>
+                <td class="mono">&quot;positive&quot;</td>
+                <td class="mono">&quot;positive&quot;</td>
+                <td><span class="status-tag pass-tag">PASS</span></td>
+                <td>0.5334s</td>
+                <td class="notes-cell">raw_label=positive score=0.93</td>
+            </tr>
+            
+            <tr>
+                <td>2</td>
+                <td title="The boutique had the handbag in stock, but only in the black colourway.">The boutique had the handbag in stock, but only in the black colourway.</td>
+                <td class="mono">&quot;neutral&quot;</td>
+                <td class="mono">&quot;neutral&quot;</td>
+                <td><span class="status-tag pass-tag">PASS</span></td>
+                <td>0.0764s</td>
+                <td class="notes-cell">raw_label=neutral score=0.9066</td>
+            </tr>
+            
+            <tr>
+                <td>3</td>
+                <td title="The perfume box was damaged and the staff refused to replace it before boarding.">The perfume box was damaged and the staff refused to replace it before boarding.</td>
+                <td class="mono">&quot;negative&quot;</td>
+                <td class="mono">&quot;negative&quot;</td>
+                <td><span class="status-tag pass-tag">PASS</span></td>
+                <td>0.0854s</td>
+                <td class="notes-cell">raw_label=negative score=0.8803</td>
+            </tr>
+            
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="use-case-card" id="card-05_ner_brands_locations">
+            <div class="use-case-header" onclick="toggleCard('05_ner_brands_locations')">
+                <div class="header-left">
+                    <span class="collapse-icon" id="icon-05_ner_brands_locations">&#9660;</span>
+                    <h3>05_ner_brands_locations</h3>
+                    <span class="type-badge-inline">Named Entity Recognition</span>
+                </div>
+                <span class="status-badge badge-pass">PASS (3/3)</span>
+            </div>
+            <div class="use-case-content" id="content-05_ner_brands_locations">
+                <div class="metadata-grid">
+                    <div>
+                        <strong>Problem</strong>
+                        <p>Named Entity Recognition</p>
+                    </div>
+                    <div>
+                        <strong>Technique</strong>
+                        <p>Gazetteer and phrase matching</p>
+                    </div>
+                    <div>
+                        <strong>Application</strong>
+                        <p>Extract brands, people, organisations, and locations from luxury-retail service notes.</p>
+                    </div>
+                    <div>
+                        <strong>Model &amp; Library</strong>
+                        <p class="mono">curated_luxury_retail_gazetteer_v1 (custom)</p>
+                        <div class="code-info-container">
+                            <span class="info-icon-badge">View Code &amp; Params</span>
+                            <div class="code-tooltip">
+                                <strong>Loader</strong>
+                                <pre>custom gazetteer phrase matcher</pre>
+                                <strong>Parameters</strong>
+                                <pre>ENTITY_PHRASES, F1 threshold &gt;= 0.66</pre>
+                                <strong>Inference Call</strong>
+                                <pre>extract_entities(text)</pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <strong>Runtime Tier</strong>
+                        <p>fast</p>
+                    </div>
+                    <div>
+                        <strong>Primary Metric</strong>
+                        <p>entity_f1_threshold</p>
+                    </div>
+                    <div>
+                        <strong>Performance</strong>
+                        <p>Load: 0.000s | Inference: 0.000s | Total: 0.000s</p>
+                    </div>
+                    <div>
+                        <strong>Completed At</strong>
+                        <p>N/A</p>
+                    </div>
+                </div>
+                <div class="metrics-box">
+                    <strong>Metrics</strong>
+                    <ul><li><strong>pass_rate:</strong> 1.0</li></ul>
+                </div>
+                
+                <h4>Evaluation Examples</h4>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 5%">#</th>
+                                <th style="width: 35%">Input</th>
+                                <th style="width: 15%">Expected</th>
+                                <th style="width: 15%">Actual</th>
+                                <th style="width: 10%">Status</th>
+                                <th style="width: 10%">Time</th>
+                                <th style="width: 10%">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+            <tr>
+                <td>1</td>
+                <td title="Dior confirmed the reservation at Changi Terminal 1 for Sophie Tan.">Dior confirmed the reservation at Changi Terminal 1 for Sophie Tan.</td>
+                <td class="mono">[[&quot;Changi Terminal 1&quot;, &quot;LOC&quot;], [&quot;Dior&quot;, &quot;ORG&quot;], [&quot;Sophie Tan&quot;, &quot;PER&quot;]]</td>
+                <td class="mono">[[&quot;Changi Terminal 1&quot;, &quot;LOC&quot;], [&quot;Dior&quot;, &quot;ORG&quot;], [&quot;Sophie Tan&quot;, &quot;PER&quot;]]</td>
+                <td><span class="status-tag pass-tag">PASS</span></td>
+                <td>0.0001s</td>
+                <td class="notes-cell">precision=1.0 recall=1.0 f1=1.0</td>
+            </tr>
+            
+            <tr>
+                <td>2</td>
+                <td title="Cartier asked James Wu from Heathrow Boutique to verify the watch pickup.">Cartier asked James Wu from Heathrow Boutique to verify the watch pickup.</td>
+                <td class="mono">[[&quot;Cartier&quot;, &quot;ORG&quot;], [&quot;Heathrow Boutique&quot;, &quot;ORG&quot;], [&quot;James Wu&quot;, &quot;PER&quot;]]</td>
+                <td class="mono">[[&quot;Cartier&quot;, &quot;ORG&quot;], [&quot;Heathrow Boutique&quot;, &quot;ORG&quot;], [&quot;James Wu&quot;, &quot;PER&quot;]]</td>
+                <td><span class="status-tag pass-tag">PASS</span></td>
+                <td>0.0000s</td>
+                <td class="notes-cell">precision=1.0 recall=1.0 f1=1.0</td>
+            </tr>
+            
+            <tr>
+                <td>3</td>
+                <td title="Macallan inventory for Hong Kong Airport was signed off by Elaine Lim.">Macallan inventory for Hong Kong Airport was signed off by Elaine Lim.</td>
+                <td class="mono">[[&quot;Elaine Lim&quot;, &quot;PER&quot;], [&quot;Hong Kong Airport&quot;, &quot;LOC&quot;], [&quot;Macallan&quot;, &quot;ORG&quot;]]</td>
+                <td class="mono">[[&quot;Elaine Lim&quot;, &quot;PER&quot;], [&quot;Hong Kong Airport&quot;, &quot;LOC&quot;], [&quot;Macallan&quot;, &quot;ORG&quot;]]</td>
+                <td><span class="status-tag pass-tag">PASS</span></td>
+                <td>0.0000s</td>
+                <td class="notes-cell">precision=1.0 recall=1.0 f1=1.0</td>
+            </tr>
+            
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="use-case-card" id="card-06_ner_people_orgs_procurement">
+            <div class="use-case-header" onclick="toggleCard('06_ner_people_orgs_procurement')">
+                <div class="header-left">
+                    <span class="collapse-icon" id="icon-06_ner_people_orgs_procurement">&#9660;</span>
+                    <h3>06_ner_people_orgs_procurement</h3>
+                    <span class="type-badge-inline">Named Entity Recognition</span>
+                </div>
+                <span class="status-badge badge-pass">PASS (2/3)</span>
+            </div>
+            <div class="use-case-content" id="content-06_ner_people_orgs_procurement">
+                <div class="metadata-grid">
+                    <div>
+                        <strong>Problem</strong>
+                        <p>Named Entity Recognition</p>
+                    </div>
+                    <div>
+                        <strong>Technique</strong>
+                        <p>Transformer token classification</p>
+                    </div>
+                    <div>
+                        <strong>Application</strong>
+                        <p>Extract brands, people, organisations, and locations from luxury-retail service notes.</p>
+                    </div>
+                    <div>
+                        <strong>Model &amp; Library</strong>
+                        <p class="mono">dslim/bert-base-NER (transformers)</p>
+                        <div class="code-info-container">
+                            <span class="info-icon-badge">View Code &amp; Params</span>
+                            <div class="code-tooltip">
+                                <strong>Loader</strong>
+                                <pre>pipeline(&#x27;ner&#x27;, model=&#x27;dslim/bert-base-NER&#x27;, aggregation_strategy=&#x27;simple&#x27;)</pre>
+                                <strong>Parameters</strong>
+                                <pre>entity-set F1 threshold &gt;= 0.66</pre>
+                                <strong>Inference Call</strong>
+                                <pre>ner(text)</pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <strong>Runtime Tier</strong>
+                        <p>medium</p>
+                    </div>
+                    <div>
+                        <strong>Primary Metric</strong>
+                        <p>entity_f1_threshold</p>
+                    </div>
+                    <div>
+                        <strong>Performance</strong>
+                        <p>Load: 1.905s | Inference: 0.636s | Total: 2.541s</p>
+                    </div>
+                    <div>
+                        <strong>Completed At</strong>
+                        <p>N/A</p>
+                    </div>
+                </div>
+                <div class="metrics-box">
+                    <strong>Metrics</strong>
+                    <ul><li><strong>pass_rate:</strong> 0.6667</li></ul>
+                </div>
+                
+                <h4>Evaluation Examples</h4>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 5%">#</th>
+                                <th style="width: 35%">Input</th>
+                                <th style="width: 15%">Expected</th>
+                                <th style="width: 15%">Actual</th>
+                                <th style="width: 10%">Status</th>
+                                <th style="width: 10%">Time</th>
+                                <th style="width: 10%">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+            <tr>
+                <td>1</td>
+                <td title="Dior confirmed the reservation at Changi Terminal 1 for Sophie Tan.">Dior confirmed the reservation at Changi Terminal 1 for Sophie Tan.</td>
+                <td class="mono">[[&quot;Changi Terminal 1&quot;, &quot;LOC&quot;], [&quot;Dior&quot;, &quot;ORG&quot;], [&quot;Sophie Tan&quot;, &quot;PER&quot;]]</td>
+                <td class="mono">[[&quot;Changi Terminal 1&quot;, &quot;LOC&quot;], [&quot;Dior&quot;, &quot;ORG&quot;], [&quot;Sophie Tan&quot;, &quot;PER&quot;]]</td>
+                <td><span class="status-tag pass-tag">PASS</span></td>
+                <td>0.4923s</td>
+                <td class="notes-cell">precision=1.0 recall=1.0 f1=1.0 raw_ner=[(&#x27;Dior&#x27;, &#x27;ORG&#x27;), (&#x27;Changi Terminal 1&#x27;, &#x27;LOC&#x27;), (&#x27;Sophie Tan&#x27;, &#x27;PER&#x27;)]</td>
+            </tr>
+            
+            <tr>
+                <td>2</td>
+                <td title="Cartier asked James Wu from Heathrow Boutique to verify the watch pickup.">Cartier asked James Wu from Heathrow Boutique to verify the watch pickup.</td>
+                <td class="mono">[[&quot;Cartier&quot;, &quot;ORG&quot;], [&quot;Heathrow Boutique&quot;, &quot;ORG&quot;], [&quot;James Wu&quot;, &quot;PER&quot;]]</td>
+                <td class="mono">[[&quot;##tier&quot;, &quot;ORG&quot;], [&quot;Car&quot;, &quot;PER&quot;], [&quot;Heathrow Boutique&quot;, &quot;ORG&quot;], [&quot;James Wu&quot;, &quot;PER&quot;]]</td>
+                <td><span class="status-tag fail-tag">FAIL</span></td>
+                <td>0.0685s</td>
+                <td class="notes-cell">precision=0.5 recall=0.6667 f1=0.5714 raw_ner=[(&#x27;Car&#x27;, &#x27;PER&#x27;), (&#x27;##tier&#x27;, &#x27;ORG&#x27;), (&#x27;James Wu&#x27;, &#x27;PER&#x27;), (&#x27;Heathrow Boutique&#x27;, &#x27;ORG&#x27;)]</td>
+            </tr>
+            
+            <tr>
+                <td>3</td>
+                <td title="Macallan inventory for Hong Kong Airport was signed off by Elaine Lim.">Macallan inventory for Hong Kong Airport was signed off by Elaine Lim.</td>
+                <td class="mono">[[&quot;Elaine Lim&quot;, &quot;PER&quot;], [&quot;Hong Kong Airport&quot;, &quot;LOC&quot;], [&quot;Macallan&quot;, &quot;ORG&quot;]]</td>
+                <td class="mono">[[&quot;Elaine Lim&quot;, &quot;PER&quot;], [&quot;Hong Kong Airport&quot;, &quot;LOC&quot;], [&quot;Macallan&quot;, &quot;ORG&quot;]]</td>
+                <td><span class="status-tag pass-tag">PASS</span></td>
+                <td>0.0753s</td>
+                <td class="notes-cell">precision=1.0 recall=1.0 f1=1.0 raw_ner=[(&#x27;Macallan&#x27;, &#x27;ORG&#x27;), (&#x27;Hong Kong Airport&#x27;, &#x27;LOC&#x27;), (&#x27;Elaine Lim&#x27;, &#x27;PER&#x27;)]</td>
+            </tr>
+            
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="use-case-card" id="card-07_classify_email_department">
+            <div class="use-case-header" onclick="toggleCard('07_classify_email_department')">
+                <div class="header-left">
+                    <span class="collapse-icon" id="icon-07_classify_email_department">&#9660;</span>
+                    <h3>07_classify_email_department</h3>
+                    <span class="type-badge-inline">Multiclass Text Classification</span>
+                </div>
+                <span class="status-badge badge-pass">PASS (3/3)</span>
+            </div>
+            <div class="use-case-content" id="content-07_classify_email_department">
+                <div class="metadata-grid">
+                    <div>
+                        <strong>Problem</strong>
+                        <p>Multiclass Text Classification</p>
+                    </div>
+                    <div>
+                        <strong>Technique</strong>
+                        <p>Keyword rules</p>
+                    </div>
+                    <div>
+                        <strong>Application</strong>
+                        <p>Route luxury-retail operational incidents into inventory, client service, or loss prevention.</p>
+                    </div>
+                    <div>
+                        <strong>Model &amp; Library</strong>
+                        <p class="mono">curated_luxury_retail_rules_v1 (custom)</p>
+                        <div class="code-info-container">
+                            <span class="info-icon-badge">View Code &amp; Params</span>
+                            <div class="code-tooltip">
+                                <strong>Loader</strong>
+                                <pre>custom keyword rules</pre>
+                                <strong>Parameters</strong>
+                                <pre>CLASS_KEYWORDS for 3 classes</pre>
+                                <strong>Inference Call</strong>
+                                <pre>classify_with_rules(text)</pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <strong>Runtime Tier</strong>
+                        <p>fast</p>
+                    </div>
+                    <div>
+                        <strong>Primary Metric</strong>
+                        <p>pass_rate</p>
+                    </div>
+                    <div>
+                        <strong>Performance</strong>
+                        <p>Load: 0.000s | Inference: 0.000s | Total: 0.000s</p>
+                    </div>
+                    <div>
+                        <strong>Completed At</strong>
+                        <p>N/A</p>
+                    </div>
+                </div>
+                <div class="metrics-box">
+                    <strong>Metrics</strong>
+                    <ul><li><strong>pass_rate:</strong> 1.0</li></ul>
+                </div>
+                
+                <h4>Evaluation Examples</h4>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 5%">#</th>
+                                <th style="width: 35%">Input</th>
+                                <th style="width: 15%">Expected</th>
+                                <th style="width: 15%">Actual</th>
+                                <th style="width: 10%">Status</th>
+                                <th style="width: 10%">Time</th>
+                                <th style="width: 10%">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+            <tr>
+                <td>1</td>
+                <td title="The limited-edition handbag still shows available online, but the boutique has no stock for collection.">The limited-edition handbag still shows available online, but the boutique has no stock for collection.</td>
+                <td class="mono">&quot;inventory_exception&quot;</td>
+                <td class="mono">&quot;inventory_exception&quot;</td>
+                <td><span class="status-tag pass-tag">PASS</span></td>
+                <td>0.0000s</td>
+                <td class="notes-cell">scores=[inventory_exception:2, client_service_exception:1, loss_prevention_exception:0]</td>
+            </tr>
+            
+            <tr>
+                <td>2</td>
+                <td title="A VIP traveller has waited forty minutes for preorder collection assistance at the cosmetics counter.">A VIP traveller has waited forty minutes for preorder collection assistance at the cosmetics counter.</td>
+                <td class="mono">&quot;client_service_exception&quot;</td>
+                <td class="mono">&quot;client_service_exception&quot;</td>
+                <td><span class="status-tag pass-tag">PASS</span></td>
+                <td>0.0000s</td>
+                <td class="notes-cell">scores=[inventory_exception:0, client_service_exception:5, loss_prevention_exception:1]</td>
+            </tr>
+            
+            <tr>
+                <td>3</td>
+                <td title="A diamond bracelet is missing after the evening stock count in Terminal 2.">A diamond bracelet is missing after the evening stock count in Terminal 2.</td>
+                <td class="mono">&quot;loss_prevention_exception&quot;</td>
+                <td class="mono">&quot;loss_prevention_exception&quot;</td>
+                <td><span class="status-tag pass-tag">PASS</span></td>
+                <td>0.0000s</td>
+                <td class="notes-cell">scores=[inventory_exception:1, client_service_exception:0, loss_prevention_exception:3]</td>
+            </tr>
+            
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="use-case-card" id="card-08_classify_supplier_urgency">
+            <div class="use-case-header" onclick="toggleCard('08_classify_supplier_urgency')">
+                <div class="header-left">
+                    <span class="collapse-icon" id="icon-08_classify_supplier_urgency">&#9660;</span>
+                    <h3>08_classify_supplier_urgency</h3>
+                    <span class="type-badge-inline">Multiclass Text Classification</span>
+                </div>
+                <span class="status-badge badge-pass">PASS (2/3)</span>
+            </div>
+            <div class="use-case-content" id="content-08_classify_supplier_urgency">
+                <div class="metadata-grid">
+                    <div>
+                        <strong>Problem</strong>
+                        <p>Multiclass Text Classification</p>
+                    </div>
+                    <div>
+                        <strong>Technique</strong>
+                        <p>Zero-shot NLI classification</p>
+                    </div>
+                    <div>
+                        <strong>Application</strong>
+                        <p>Route luxury-retail operational incidents into inventory, client service, or loss prevention.</p>
+                    </div>
+                    <div>
+                        <strong>Model &amp; Library</strong>
+                        <p class="mono">MoritzLaurer/deberta-v3-base-zeroshot-v2.0 (transformers)</p>
+                        <div class="code-info-container">
+                            <span class="info-icon-badge">View Code &amp; Params</span>
+                            <div class="code-tooltip">
+                                <strong>Loader</strong>
+                                <pre>AutoTokenizer.from_pretrained(model)
+AutoModelForSequenceClassification.from_pretrained(model)</pre>
+                                <strong>Parameters</strong>
+                                <pre>3 class-specific NLI hypotheses</pre>
+                                <strong>Inference Call</strong>
+                                <pre>softmax(model(tokenizer(text, hypothesis)))</pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <strong>Runtime Tier</strong>
+                        <p>medium</p>
+                    </div>
+                    <div>
+                        <strong>Primary Metric</strong>
+                        <p>pass_rate</p>
+                    </div>
+                    <div>
+                        <strong>Performance</strong>
+                        <p>Load: 3.350s | Inference: 15.939s | Total: 19.288s</p>
+                    </div>
+                    <div>
+                        <strong>Completed At</strong>
+                        <p>N/A</p>
+                    </div>
+                </div>
+                <div class="metrics-box">
+                    <strong>Metrics</strong>
+                    <ul><li><strong>pass_rate:</strong> 0.6667</li></ul>
+                </div>
+                
+                <h4>Evaluation Examples</h4>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 5%">#</th>
+                                <th style="width: 35%">Input</th>
+                                <th style="width: 15%">Expected</th>
+                                <th style="width: 15%">Actual</th>
+                                <th style="width: 10%">Status</th>
+                                <th style="width: 10%">Time</th>
+                                <th style="width: 10%">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+            <tr>
+                <td>1</td>
+                <td title="The limited-edition handbag still shows available online, but the boutique has no stock for collection.">The limited-edition handbag still shows available online, but the boutique has no stock for collection.</td>
+                <td class="mono">&quot;inventory_exception&quot;</td>
+                <td class="mono">&quot;inventory_exception&quot;</td>
+                <td><span class="status-tag pass-tag">PASS</span></td>
+                <td>5.5213s</td>
+                <td class="notes-cell">scores=[inventory_exception:0.983, loss_prevention_exception:0.027, client_service_exception:0.024]</td>
+            </tr>
+            
+            <tr>
+                <td>2</td>
+                <td title="A VIP traveller has waited forty minutes for preorder collection assistance at the cosmetics counter.">A VIP traveller has waited forty minutes for preorder collection assistance at the cosmetics counter.</td>
+                <td class="mono">&quot;client_service_exception&quot;</td>
+                <td class="mono">&quot;client_service_exception&quot;</td>
+                <td><span class="status-tag pass-tag">PASS</span></td>
+                <td>5.1538s</td>
+                <td class="notes-cell">scores=[client_service_exception:0.52, inventory_exception:0.097, loss_prevention_exception:0.0]</td>
+            </tr>
+            
+            <tr>
+                <td>3</td>
+                <td title="A diamond bracelet is missing after the evening stock count in Terminal 2.">A diamond bracelet is missing after the evening stock count in Terminal 2.</td>
+                <td class="mono">&quot;loss_prevention_exception&quot;</td>
+                <td class="mono">&quot;inventory_exception&quot;</td>
+                <td><span class="status-tag fail-tag">FAIL</span></td>
+                <td>5.2636s</td>
+                <td class="notes-cell">scores=[inventory_exception:0.917, loss_prevention_exception:0.519, client_service_exception:0.018]</td>
+            </tr>
+            
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="use-case-card" id="card-09_classify_feedback_topic">
+            <div class="use-case-header" onclick="toggleCard('09_classify_feedback_topic')">
+                <div class="header-left">
+                    <span class="collapse-icon" id="icon-09_classify_feedback_topic">&#9660;</span>
+                    <h3>09_classify_feedback_topic</h3>
+                    <span class="type-badge-inline">Multiclass Text Classification</span>
+                </div>
+                <span class="status-badge badge-pass">PASS (3/3)</span>
+            </div>
+            <div class="use-case-content" id="content-09_classify_feedback_topic">
+                <div class="metadata-grid">
+                    <div>
+                        <strong>Problem</strong>
+                        <p>Multiclass Text Classification</p>
+                    </div>
+                    <div>
+                        <strong>Technique</strong>
+                        <p>Few-shot embedding prototypes</p>
+                    </div>
+                    <div>
+                        <strong>Application</strong>
+                        <p>Route luxury-retail operational incidents into inventory, client service, or loss prevention.</p>
+                    </div>
+                    <div>
+                        <strong>Model &amp; Library</strong>
+                        <p class="mono">sentence-transformers/all-mpnet-base-v2 (sentence-transformers)</p>
+                        <div class="code-info-container">
+                            <span class="info-icon-badge">View Code &amp; Params</span>
+                            <div class="code-tooltip">
+                                <strong>Loader</strong>
+                                <pre>SentenceTransformer(&#x27;all-mpnet-base-v2&#x27;, device=&#x27;cpu&#x27;)</pre>
+                                <strong>Parameters</strong>
+                                <pre>3 support examples per class, centroid prototypes</pre>
+                                <strong>Inference Call</strong>
+                                <pre>util.cos_sim(query_embedding, class_prototype)</pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <strong>Runtime Tier</strong>
+                        <p>medium</p>
+                    </div>
+                    <div>
+                        <strong>Primary Metric</strong>
+                        <p>pass_rate</p>
+                    </div>
+                    <div>
+                        <strong>Performance</strong>
+                        <p>Load: 6.668s | Inference: 0.550s | Total: 7.218s</p>
+                    </div>
+                    <div>
+                        <strong>Completed At</strong>
+                        <p>N/A</p>
+                    </div>
+                </div>
+                <div class="metrics-box">
+                    <strong>Metrics</strong>
+                    <ul><li><strong>pass_rate:</strong> 1.0</li></ul>
+                </div>
+                
+                <h4>Evaluation Examples</h4>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 5%">#</th>
+                                <th style="width: 35%">Input</th>
+                                <th style="width: 15%">Expected</th>
+                                <th style="width: 15%">Actual</th>
+                                <th style="width: 10%">Status</th>
+                                <th style="width: 10%">Time</th>
+                                <th style="width: 10%">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+            <tr>
+                <td>1</td>
+                <td title="The limited-edition handbag still shows available online, but the boutique has no stock for collection.">The limited-edition handbag still shows available online, but the boutique has no stock for collection.</td>
+                <td class="mono">&quot;inventory_exception&quot;</td>
+                <td class="mono">&quot;inventory_exception&quot;</td>
+                <td><span class="status-tag pass-tag">PASS</span></td>
+                <td>0.2302s</td>
+                <td class="notes-cell">prototype_cosine=[inventory_exception:0.6486, loss_prevention_exception:0.4411, client_service_exception:0.4063]</td>
+            </tr>
+            
+            <tr>
+                <td>2</td>
+                <td title="A VIP traveller has waited forty minutes for preorder collection assistance at the cosmetics counter.">A VIP traveller has waited forty minutes for preorder collection assistance at the cosmetics counter.</td>
+                <td class="mono">&quot;client_service_exception&quot;</td>
+                <td class="mono">&quot;client_service_exception&quot;</td>
+                <td><span class="status-tag pass-tag">PASS</span></td>
+                <td>0.1708s</td>
+                <td class="notes-cell">prototype_cosine=[client_service_exception:0.6078, inventory_exception:0.423, loss_prevention_exception:0.3521]</td>
+            </tr>
+            
+            <tr>
+                <td>3</td>
+                <td title="A diamond bracelet is missing after the evening stock count in Terminal 2.">A diamond bracelet is missing after the evening stock count in Terminal 2.</td>
+                <td class="mono">&quot;loss_prevention_exception&quot;</td>
+                <td class="mono">&quot;loss_prevention_exception&quot;</td>
+                <td><span class="status-tag pass-tag">PASS</span></td>
+                <td>0.1490s</td>
+                <td class="notes-cell">prototype_cosine=[loss_prevention_exception:0.6617, inventory_exception:0.52, client_service_exception:0.3402]</td>
+            </tr>
+            
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="use-case-card" id="card-10_similarity_complaint_lookup">
+            <div class="use-case-header" onclick="toggleCard('10_similarity_complaint_lookup')">
+                <div class="header-left">
+                    <span class="collapse-icon" id="icon-10_similarity_complaint_lookup">&#9660;</span>
+                    <h3>10_similarity_complaint_lookup</h3>
+                    <span class="type-badge-inline">Information Retrieval</span>
+                </div>
+                <span class="status-badge badge-pass">PASS (3/3)</span>
+            </div>
+            <div class="use-case-content" id="content-10_similarity_complaint_lookup">
+                <div class="metadata-grid">
+                    <div>
+                        <strong>Problem</strong>
+                        <p>Information Retrieval</p>
+                    </div>
+                    <div>
+                        <strong>Technique</strong>
+                        <p>BM25 lexical retrieval</p>
+                    </div>
+                    <div>
+                        <strong>Application</strong>
+                        <p>Retrieve luxury-retail SOP passages for staff questions using lexical matching.</p>
+                    </div>
+                    <div>
+                        <strong>Model &amp; Library</strong>
+                        <p class="mono">curated_bm25_retriever_v1 (custom)</p>
+                        <div class="code-info-container">
+                            <span class="info-icon-badge">View Code &amp; Params</span>
+                            <div class="code-tooltip">
+                                <strong>Loader</strong>
+                                <pre>custom BM25 lexical retriever</pre>
+                                <strong>Parameters</strong>
+                                <pre>k1=1.5, b=0.75</pre>
+                                <strong>Inference Call</strong>
+                                <pre>bm25_scores(query, index)</pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <strong>Runtime Tier</strong>
+                        <p>fast</p>
+                    </div>
+                    <div>
+                        <strong>Primary Metric</strong>
+                        <p>pass_rate</p>
+                    </div>
+                    <div>
+                        <strong>Performance</strong>
+                        <p>Load: 0.000s | Inference: 0.000s | Total: 0.001s</p>
+                    </div>
+                    <div>
+                        <strong>Completed At</strong>
+                        <p>N/A</p>
+                    </div>
+                </div>
+                <div class="metrics-box">
+                    <strong>Metrics</strong>
+                    <ul><li><strong>pass_rate:</strong> 1.0</li></ul>
+                </div>
+                
+                <h4>Evaluation Examples</h4>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 5%">#</th>
+                                <th style="width: 35%">Input</th>
+                                <th style="width: 15%">Expected</th>
+                                <th style="width: 15%">Actual</th>
+                                <th style="width: 10%">Status</th>
+                                <th style="width: 10%">Time</th>
+                                <th style="width: 10%">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+            <tr>
+                <td>1</td>
+                <td title="Can a traveller return an unopened perfume without the original receipt?">Can a traveller return an unopened perfume without the original receipt?</td>
+                <td class="mono">&quot;sop_returns_unopened&quot;</td>
+                <td class="mono">&quot;sop_returns_unopened&quot;</td>
+                <td><span class="status-tag pass-tag">PASS</span></td>
+                <td>0.0002s</td>
+                <td class="notes-cell">bm25_scores=[sop_returns_unopened:5.1356, sop_authenticity_card:0.5443, sop_missed_collection:2.5223, sop_opened_cosmetics:2.1014, sop_repair_watch:0.5779, sop_damaged_packaging:0.1206] matched_text=&#x27;Unopened fragrance and cosmetics items may be returned within 14 days with the original receipt and full packaging.&#x27;</td>
+            </tr>
+            
+            <tr>
+                <td>2</td>
+                <td title="What should staff do when a luxury watch authenticity card is missing?">What should staff do when a luxury watch authenticity card is missing?</td>
+                <td class="mono">&quot;sop_authenticity_card&quot;</td>
+                <td class="mono">&quot;sop_authenticity_card&quot;</td>
+                <td><span class="status-tag pass-tag">PASS</span></td>
+                <td>0.0001s</td>
+                <td class="notes-cell">bm25_scores=[sop_returns_unopened:0.0, sop_authenticity_card:6.6819, sop_missed_collection:1.0057, sop_opened_cosmetics:1.1598, sop_repair_watch:4.5265, sop_damaged_packaging:2.8065] matched_text=&#x27;If a watch authenticity card is missing, staff must verify the serial number, contact the brand liaison, and document the handover before release.&#x27;</td>
+            </tr>
+            
+            <tr>
+                <td>3</td>
+                <td title="Can an airport preorder be collected after the passenger&#x27;s flight departs?">Can an airport preorder be collected after the passenger&#x27;s flight departs?</td>
+                <td class="mono">&quot;sop_missed_collection&quot;</td>
+                <td class="mono">&quot;sop_missed_collection&quot;</td>
+                <td><span class="status-tag pass-tag">PASS</span></td>
+                <td>0.0001s</td>
+                <td class="notes-cell">bm25_scores=[sop_returns_unopened:1.7659, sop_authenticity_card:0.1206, sop_missed_collection:2.8452, sop_opened_cosmetics:0.0757, sop_repair_watch:0.083, sop_damaged_packaging:0.1206] matched_text=&#x27;If a traveller misses airport preorder collection, staff must cancel the airside hold, move the item to customer service review, and contact the traveller for next steps.&#x27;</td>
+            </tr>
+            
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="use-case-card" id="card-11_similarity_sop_retrieval">
+            <div class="use-case-header" onclick="toggleCard('11_similarity_sop_retrieval')">
+                <div class="header-left">
+                    <span class="collapse-icon" id="icon-11_similarity_sop_retrieval">&#9660;</span>
+                    <h3>11_similarity_sop_retrieval</h3>
+                    <span class="type-badge-inline">Information Retrieval</span>
+                </div>
+                <span class="status-badge badge-pass">PASS (3/3)</span>
+            </div>
+            <div class="use-case-content" id="content-11_similarity_sop_retrieval">
+                <div class="metadata-grid">
+                    <div>
+                        <strong>Problem</strong>
+                        <p>Information Retrieval</p>
+                    </div>
+                    <div>
+                        <strong>Technique</strong>
+                        <p>Dense bi-encoder retrieval</p>
+                    </div>
+                    <div>
+                        <strong>Application</strong>
+                        <p>Retrieve luxury-retail SOP passages for staff questions using semantic embeddings.</p>
+                    </div>
+                    <div>
+                        <strong>Model &amp; Library</strong>
+                        <p class="mono">sentence-transformers/all-mpnet-base-v2 (sentence-transformers)</p>
+                        <div class="code-info-container">
+                            <span class="info-icon-badge">View Code &amp; Params</span>
+                            <div class="code-tooltip">
+                                <strong>Loader</strong>
+                                <pre>SentenceTransformer(&#x27;all-mpnet-base-v2&#x27;, device=&#x27;cpu&#x27;)</pre>
+                                <strong>Parameters</strong>
+                                <pre>corpus pre-encoded once</pre>
+                                <strong>Inference Call</strong>
+                                <pre>util.cos_sim(query_embedding, corpus_embeddings)</pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <strong>Runtime Tier</strong>
+                        <p>medium</p>
+                    </div>
+                    <div>
+                        <strong>Primary Metric</strong>
+                        <p>pass_rate</p>
+                    </div>
+                    <div>
+                        <strong>Performance</strong>
+                        <p>Load: 6.077s | Inference: 0.244s | Total: 6.321s</p>
+                    </div>
+                    <div>
+                        <strong>Completed At</strong>
+                        <p>N/A</p>
+                    </div>
+                </div>
+                <div class="metrics-box">
+                    <strong>Metrics</strong>
+                    <ul><li><strong>pass_rate:</strong> 1.0</li></ul>
+                </div>
+                
+                <h4>Evaluation Examples</h4>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 5%">#</th>
+                                <th style="width: 35%">Input</th>
+                                <th style="width: 15%">Expected</th>
+                                <th style="width: 15%">Actual</th>
+                                <th style="width: 10%">Status</th>
+                                <th style="width: 10%">Time</th>
+                                <th style="width: 10%">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+            <tr>
+                <td>1</td>
+                <td title="Can a traveller return an unopened perfume without the original receipt?">Can a traveller return an unopened perfume without the original receipt?</td>
+                <td class="mono">&quot;sop_returns_unopened&quot;</td>
+                <td class="mono">&quot;sop_returns_unopened&quot;</td>
+                <td><span class="status-tag pass-tag">PASS</span></td>
+                <td>0.0836s</td>
+                <td class="notes-cell">cosine_scores=[sop_returns_unopened:0.729, sop_authenticity_card:0.328, sop_missed_collection:0.285, sop_opened_cosmetics:0.64, sop_repair_watch:0.191, sop_damaged_packaging:0.338] matched_text=&#x27;Unopened fragrance and cosmetics items may be returned within 14 days with the original receipt and full packaging.&#x27;</td>
+            </tr>
+            
+            <tr>
+                <td>2</td>
+                <td title="What should staff do when a luxury watch authenticity card is missing?">What should staff do when a luxury watch authenticity card is missing?</td>
+                <td class="mono">&quot;sop_authenticity_card&quot;</td>
+                <td class="mono">&quot;sop_authenticity_card&quot;</td>
+                <td><span class="status-tag pass-tag">PASS</span></td>
+                <td>0.0790s</td>
+                <td class="notes-cell">cosine_scores=[sop_returns_unopened:0.298, sop_authenticity_card:0.829, sop_missed_collection:0.251, sop_opened_cosmetics:0.325, sop_repair_watch:0.632, sop_damaged_packaging:0.442] matched_text=&#x27;If a watch authenticity card is missing, staff must verify the serial number, contact the brand liaison, and document the handover before release.&#x27;</td>
+            </tr>
+            
+            <tr>
+                <td>3</td>
+                <td title="Can an airport preorder be collected after the passenger&#x27;s flight departs?">Can an airport preorder be collected after the passenger&#x27;s flight departs?</td>
+                <td class="mono">&quot;sop_missed_collection&quot;</td>
+                <td class="mono">&quot;sop_missed_collection&quot;</td>
+                <td><span class="status-tag pass-tag">PASS</span></td>
+                <td>0.0819s</td>
+                <td class="notes-cell">cosine_scores=[sop_returns_unopened:0.186, sop_authenticity_card:0.119, sop_missed_collection:0.689, sop_opened_cosmetics:0.102, sop_repair_watch:-0.013, sop_damaged_packaging:0.187] matched_text=&#x27;If a traveller misses airport preorder collection, staff must cancel the airside hold, move the item to customer service review, and contact the traveller for next steps.&#x27;</td>
+            </tr>
+            
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="use-case-card" id="card-12_fewshot_email_department">
+            <div class="use-case-header" onclick="toggleCard('12_fewshot_email_department')">
+                <div class="header-left">
+                    <span class="collapse-icon" id="icon-12_fewshot_email_department">&#9660;</span>
+                    <h3>12_fewshot_email_department</h3>
+                    <span class="type-badge-inline">Information Retrieval</span>
+                </div>
+                <span class="status-badge badge-pass">PASS (3/3)</span>
+            </div>
+            <div class="use-case-content" id="content-12_fewshot_email_department">
+                <div class="metadata-grid">
+                    <div>
+                        <strong>Problem</strong>
+                        <p>Information Retrieval</p>
+                    </div>
+                    <div>
+                        <strong>Technique</strong>
+                        <p>Cross-encoder reranking</p>
+                    </div>
+                    <div>
+                        <strong>Application</strong>
+                        <p>Retrieve luxury-retail SOP passages by reranking lexical candidates with a local cross-encoder.</p>
+                    </div>
+                    <div>
+                        <strong>Model &amp; Library</strong>
+                        <p class="mono">cross-encoder/ms-marco-MiniLM-L6-v2 (sentence-transformers)</p>
+                        <div class="code-info-container">
+                            <span class="info-icon-badge">View Code &amp; Params</span>
+                            <div class="code-tooltip">
+                                <strong>Loader</strong>
+                                <pre>CrossEncoder(&#x27;cross-encoder/ms-marco-MiniLM-L6-v2&#x27;)</pre>
+                                <strong>Parameters</strong>
+                                <pre>rerank top 3 BM25 candidates</pre>
+                                <strong>Inference Call</strong>
+                                <pre>reranker.predict([(query, candidate_text), ...])</pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <strong>Runtime Tier</strong>
+                        <p>medium</p>
+                    </div>
+                    <div>
+                        <strong>Primary Metric</strong>
+                        <p>pass_rate</p>
+                    </div>
+                    <div>
+                        <strong>Performance</strong>
+                        <p>Load: 4.375s | Inference: 0.335s | Total: 4.710s</p>
+                    </div>
+                    <div>
+                        <strong>Completed At</strong>
+                        <p>N/A</p>
+                    </div>
+                </div>
+                <div class="metrics-box">
+                    <strong>Metrics</strong>
+                    <ul><li><strong>pass_rate:</strong> 1.0</li></ul>
+                </div>
+                
+                <h4>Evaluation Examples</h4>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 5%">#</th>
+                                <th style="width: 35%">Input</th>
+                                <th style="width: 15%">Expected</th>
+                                <th style="width: 15%">Actual</th>
+                                <th style="width: 10%">Status</th>
+                                <th style="width: 10%">Time</th>
+                                <th style="width: 10%">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+            <tr>
+                <td>1</td>
+                <td title="Can a traveller return an unopened perfume without the original receipt?">Can a traveller return an unopened perfume without the original receipt?</td>
+                <td class="mono">&quot;sop_returns_unopened&quot;</td>
+                <td class="mono">&quot;sop_returns_unopened&quot;</td>
+                <td><span class="status-tag pass-tag">PASS</span></td>
+                <td>0.1914s</td>
+                <td class="notes-cell">rerank_scores=[sop_returns_unopened:4.955, sop_missed_collection:-7.933, sop_opened_cosmetics:-6.974] top_k=3</td>
+            </tr>
+            
+            <tr>
+                <td>2</td>
+                <td title="What should staff do when a luxury watch authenticity card is missing?">What should staff do when a luxury watch authenticity card is missing?</td>
+                <td class="mono">&quot;sop_authenticity_card&quot;</td>
+                <td class="mono">&quot;sop_authenticity_card&quot;</td>
+                <td><span class="status-tag pass-tag">PASS</span></td>
+                <td>0.0832s</td>
+                <td class="notes-cell">rerank_scores=[sop_authenticity_card:8.438, sop_repair_watch:-2.847, sop_damaged_packaging:-4.123] top_k=3</td>
+            </tr>
+            
+            <tr>
+                <td>3</td>
+                <td title="Can an airport preorder be collected after the passenger&#x27;s flight departs?">Can an airport preorder be collected after the passenger&#x27;s flight departs?</td>
+                <td class="mono">&quot;sop_missed_collection&quot;</td>
+                <td class="mono">&quot;sop_missed_collection&quot;</td>
+                <td><span class="status-tag pass-tag">PASS</span></td>
+                <td>0.0602s</td>
+                <td class="notes-cell">rerank_scores=[sop_missed_collection:4.449, sop_returns_unopened:-9.752, sop_authenticity_card:-11.021] top_k=3</td>
+            </tr>
+            
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="use-case-card" id="card-13_fewshot_supplier_urgency">
+            <div class="use-case-header" onclick="toggleCard('13_fewshot_supplier_urgency')">
+                <div class="header-left">
+                    <span class="collapse-icon" id="icon-13_fewshot_supplier_urgency">&#9660;</span>
+                    <h3>13_fewshot_supplier_urgency</h3>
+                    <span class="type-badge-inline">Extractive Question Answering</span>
+                </div>
+                <span class="status-badge badge-amber">BORDERLINE (1/3)</span>
+            </div>
+            <div class="use-case-content" id="content-13_fewshot_supplier_urgency">
+                <div class="metadata-grid">
+                    <div>
+                        <strong>Problem</strong>
+                        <p>Extractive Question Answering</p>
+                    </div>
+                    <div>
+                        <strong>Technique</strong>
+                        <p>Transformer span extraction</p>
+                    </div>
+                    <div>
+                        <strong>Application</strong>
+                        <p>Extract exact policy answers from luxury-retail SOP text.</p>
+                    </div>
+                    <div>
+                        <strong>Model &amp; Library</strong>
+                        <p class="mono">deepset/tinyroberta-squad2 (transformers)</p>
+                        <div class="code-info-container">
+                            <span class="info-icon-badge">View Code &amp; Params</span>
+                            <div class="code-tooltip">
+                                <strong>Loader</strong>
+                                <pre>AutoTokenizer.from_pretrained(model)
+AutoModelForQuestionAnswering.from_pretrained(model)</pre>
+                                <strong>Parameters</strong>
+                                <pre>manual argmax span extraction over start/end logits</pre>
+                                <strong>Inference Call</strong>
+                                <pre>tokenizer(question, context) -&gt; model(**inputs)</pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <strong>Runtime Tier</strong>
+                        <p>medium</p>
+                    </div>
+                    <div>
+                        <strong>Primary Metric</strong>
+                        <p>exact_match</p>
+                    </div>
+                    <div>
+                        <strong>Performance</strong>
+                        <p>Load: 1.913s | Inference: 0.223s | Total: 2.136s</p>
+                    </div>
+                    <div>
+                        <strong>Completed At</strong>
+                        <p>N/A</p>
+                    </div>
+                </div>
+                <div class="metrics-box">
+                    <strong>Metrics</strong>
+                    <ul><li><strong>pass_rate:</strong> 0.3333</li></ul>
+                </div>
+                
+                <h4>Evaluation Examples</h4>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 5%">#</th>
+                                <th style="width: 35%">Input</th>
+                                <th style="width: 15%">Expected</th>
+                                <th style="width: 15%">Actual</th>
+                                <th style="width: 10%">Status</th>
+                                <th style="width: 10%">Time</th>
+                                <th style="width: 10%">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+            <tr>
+                <td>1</td>
+                <td title="How many days can unopened fragrance be returned?">How many days can unopened fragrance be returned?</td>
+                <td class="mono">&quot;14 days&quot;</td>
+                <td class="mono">&quot;14&quot;</td>
+                <td><span class="status-tag fail-tag">FAIL</span></td>
+                <td>0.1182s</td>
+                <td class="notes-cell">start_idx=29 end_idx=29 context_length=207</td>
+            </tr>
+            
+            <tr>
+                <td>2</td>
+                <td title="What must staff verify when the authenticity card is missing?">What must staff verify when the authenticity card is missing?</td>
+                <td class="mono">&quot;the serial number&quot;</td>
+                <td class="mono">&quot;the serial number&quot;</td>
+                <td><span class="status-tag pass-tag">PASS</span></td>
+                <td>0.0498s</td>
+                <td class="notes-cell">start_idx=29 end_idx=31 context_length=180</td>
+            </tr>
+            
+            <tr>
+                <td>3</td>
+                <td title="Are opened cosmetics eligible for return?">Are opened cosmetics eligible for return?</td>
+                <td class="mono">&quot;not eligible for return&quot;</td>
+                <td class="mono">&quot;not eligible for return unless a product defect is confirmed by the boutique manager&quot;</td>
+                <td><span class="status-tag fail-tag">FAIL</span></td>
+                <td>0.0552s</td>
+                <td class="notes-cell">start_idx=23 end_idx=36 context_length=148</td>
+            </tr>
+            
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="use-case-card" id="card-14_fewshot_feedback_topic">
+            <div class="use-case-header" onclick="toggleCard('14_fewshot_feedback_topic')">
+                <div class="header-left">
+                    <span class="collapse-icon" id="icon-14_fewshot_feedback_topic">&#9660;</span>
+                    <h3>14_fewshot_feedback_topic</h3>
+                    <span class="type-badge-inline">Template-Based Information Extraction</span>
+                </div>
+                <span class="status-badge badge-pass">PASS (3/3)</span>
+            </div>
+            <div class="use-case-content" id="content-14_fewshot_feedback_topic">
+                <div class="metadata-grid">
+                    <div>
+                        <strong>Problem</strong>
+                        <p>Template-Based Information Extraction</p>
+                    </div>
+                    <div>
+                        <strong>Technique</strong>
+                        <p>Regular expressions and deterministic parsing</p>
+                    </div>
+                    <div>
+                        <strong>Application</strong>
+                        <p>Parse luxury-retail receipt and stock-transfer text into structured fields.</p>
+                    </div>
+                    <div>
+                        <strong>Model &amp; Library</strong>
+                        <p class="mono">curated_regex_parser_v1 (custom)</p>
+                        <div class="code-info-container">
+                            <span class="info-icon-badge">View Code &amp; Params</span>
+                            <div class="code-tooltip">
+                                <strong>Loader</strong>
+                                <pre>custom regex parser</pre>
+                                <strong>Parameters</strong>
+                                <pre>pattern per template family</pre>
+                                <strong>Inference Call</strong>
+                                <pre>extract_fields(text)</pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <strong>Runtime Tier</strong>
+                        <p>fast</p>
+                    </div>
+                    <div>
+                        <strong>Primary Metric</strong>
+                        <p>pass_rate</p>
+                    </div>
+                    <div>
+                        <strong>Performance</strong>
+                        <p>Load: 0.000s | Inference: 0.001s | Total: 0.001s</p>
+                    </div>
+                    <div>
+                        <strong>Completed At</strong>
+                        <p>N/A</p>
+                    </div>
+                </div>
+                <div class="metrics-box">
+                    <strong>Metrics</strong>
+                    <ul><li><strong>pass_rate:</strong> 1.0</li></ul>
+                </div>
+                
+                <h4>Evaluation Examples</h4>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 5%">#</th>
+                                <th style="width: 35%">Input</th>
+                                <th style="width: 15%">Expected</th>
+                                <th style="width: 15%">Actual</th>
+                                <th style="width: 10%">Status</th>
+                                <th style="width: 10%">Time</th>
+                                <th style="width: 10%">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+            <tr>
+                <td>1</td>
+                <td title="Transfer 6 x SKU CH-8841 at SGD 2450 from T1 boutique to T3 collection desk.">Transfer 6 x SKU CH-8841 at SGD 2450 from T1 boutique to T3 collection desk.</td>
+                <td class="mono">{&quot;quantity&quot;: 6, &quot;sku&quot;: &quot;CH-8841&quot;, &quot;currency&quot;: &quot;SGD&quot;, &quot;price&quot;: 2450, &quot;from_location&quot;: &quot;T1 boutique&quot;, &quot;to_location&quot;: &quot;T3 collection desk&quot;}</td>
+                <td class="mono">{&quot;quantity&quot;: 6, &quot;sku&quot;: &quot;CH-8841&quot;, &quot;currency&quot;: &quot;SGD&quot;, &quot;price&quot;: 2450, &quot;from_location&quot;: &quot;T1 boutique&quot;, &quot;to_location&quot;: &quot;T3 collection desk&quot;}</td>
+                <td><span class="status-tag pass-tag">PASS</span></td>
+                <td>0.0003s</td>
+                <td class="notes-cell">field_count=6</td>
+            </tr>
+            
+            <tr>
+                <td>2</td>
+                <td title="Receipt HKG-92817: 2 Dior fragrances, total HKD 2180.">Receipt HKG-92817: 2 Dior fragrances, total HKD 2180.</td>
+                <td class="mono">{&quot;receipt_id&quot;: &quot;HKG-92817&quot;, &quot;quantity&quot;: 2, &quot;product&quot;: &quot;Dior fragrances&quot;, &quot;currency&quot;: &quot;HKD&quot;, &quot;total&quot;: 2180}</td>
+                <td class="mono">{&quot;receipt_id&quot;: &quot;HKG-92817&quot;, &quot;quantity&quot;: 2, &quot;product&quot;: &quot;Dior fragrances&quot;, &quot;currency&quot;: &quot;HKD&quot;, &quot;total&quot;: 2180}</td>
+                <td><span class="status-tag pass-tag">PASS</span></td>
+                <td>0.0002s</td>
+                <td class="notes-cell">field_count=5</td>
+            </tr>
+            
+            <tr>
+                <td>3</td>
+                <td title="Received 11 of 12 Macallan 18 700ml bottles at Changi stockroom.">Received 11 of 12 Macallan 18 700ml bottles at Changi stockroom.</td>
+                <td class="mono">{&quot;received_quantity&quot;: 11, &quot;expected_quantity&quot;: 12, &quot;product&quot;: &quot;Macallan 18 700ml bottles&quot;, &quot;location&quot;: &quot;Changi stockroom&quot;}</td>
+                <td class="mono">{&quot;received_quantity&quot;: 11, &quot;expected_quantity&quot;: 12, &quot;product&quot;: &quot;Macallan 18 700ml bottles&quot;, &quot;location&quot;: &quot;Changi stockroom&quot;}</td>
+                <td><span class="status-tag pass-tag">PASS</span></td>
+                <td>0.0001s</td>
+                <td class="notes-cell">field_count=4</td>
+            </tr>
+            
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="use-case-card" id="card-15_entity_resolution_fuzzy">
+            <div class="use-case-header" onclick="toggleCard('15_entity_resolution_fuzzy')">
+                <div class="header-left">
+                    <span class="collapse-icon" id="icon-15_entity_resolution_fuzzy">&#9660;</span>
+                    <h3>15_entity_resolution_fuzzy</h3>
+                    <span class="type-badge-inline">Entity Resolution</span>
+                </div>
+                <span class="status-badge badge-pass">PASS (3/3)</span>
+            </div>
+            <div class="use-case-content" id="content-15_entity_resolution_fuzzy">
+                <div class="metadata-grid">
+                    <div>
+                        <strong>Problem</strong>
+                        <p>Entity Resolution</p>
+                    </div>
+                    <div>
+                        <strong>Technique</strong>
+                        <p>String normalization and fuzzy matching</p>
+                    </div>
+                    <div>
+                        <strong>Application</strong>
+                        <p>Resolve informal luxury-retail product names to canonical catalogue SKUs.</p>
+                    </div>
+                    <div>
+                        <strong>Model &amp; Library</strong>
+                        <p class="mono">curated_fuzzy_matcher_v1 (custom)</p>
+                        <div class="code-info-container">
+                            <span class="info-icon-badge">View Code &amp; Params</span>
+                            <div class="code-tooltip">
+                                <strong>Loader</strong>
+                                <pre>custom fuzzy matcher</pre>
+                                <strong>Parameters</strong>
+                                <pre>SequenceMatcher ratio over catalog names</pre>
+                                <strong>Inference Call</strong>
+                                <pre>fuzzy_ratio(query, catalog_name)</pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <strong>Runtime Tier</strong>
+                        <p>fast</p>
+                    </div>
+                    <div>
+                        <strong>Primary Metric</strong>
+                        <p>pass_rate</p>
+                    </div>
+                    <div>
+                        <strong>Performance</strong>
+                        <p>Load: 0.000s | Inference: 0.001s | Total: 0.001s</p>
+                    </div>
+                    <div>
+                        <strong>Completed At</strong>
+                        <p>N/A</p>
+                    </div>
+                </div>
+                <div class="metrics-box">
+                    <strong>Metrics</strong>
+                    <ul><li><strong>pass_rate:</strong> 1.0</li></ul>
+                </div>
+                
+                <h4>Evaluation Examples</h4>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 5%">#</th>
+                                <th style="width: 35%">Input</th>
+                                <th style="width: 15%">Expected</th>
+                                <th style="width: 15%">Actual</th>
+                                <th style="width: 10%">Status</th>
+                                <th style="width: 10%">Time</th>
+                                <th style="width: 10%">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+            <tr>
+                <td>1</td>
+                <td title="JW Blue 1 litre">JW Blue 1 litre</td>
+                <td class="mono">&quot;JW-BLUE-1L&quot;</td>
+                <td class="mono">&quot;JW-BLUE-1L&quot;</td>
+                <td><span class="status-tag pass-tag">PASS</span></td>
+                <td>0.0007s</td>
+                <td class="notes-cell">top_matches=[JW-BLUE-1L:0.4255, CART-TANK-L:0.2564, LV-KEEPALL-50:0.2564]</td>
+            </tr>
+            
+            <tr>
+                <td>2</td>
+                <td title="Johnnie Walker Blue Label 1000ml">Johnnie Walker Blue Label 1000ml</td>
+                <td class="mono">&quot;JW-BLUE-1L&quot;</td>
+                <td class="mono">&quot;JW-BLUE-1L&quot;</td>
+                <td><span class="status-tag pass-tag">PASS</span></td>
+                <td>0.0004s</td>
+                <td class="notes-cell">top_matches=[JW-BLUE-1L:1.0, MAC-18-700:0.3793, DIOR-SADDLE-BLK:0.3019]</td>
+            </tr>
+            
+            <tr>
+                <td>3</td>
+                <td title="Jonnie Walker Blu 1L">Jonnie Walker Blu 1L</td>
+                <td class="mono">&quot;JW-BLUE-1L&quot;</td>
+                <td class="mono">&quot;JW-BLUE-1L&quot;</td>
+                <td><span class="status-tag pass-tag">PASS</span></td>
+                <td>0.0003s</td>
+                <td class="notes-cell">top_matches=[JW-BLUE-1L:0.7692, MAC-18-700:0.3478, DIOR-SADDLE-BLK:0.3415]</td>
+            </tr>
+            
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="use-case-card" id="card-16_entity_resolution_dense">
+            <div class="use-case-header" onclick="toggleCard('16_entity_resolution_dense')">
+                <div class="header-left">
+                    <span class="collapse-icon" id="icon-16_entity_resolution_dense">&#9660;</span>
+                    <h3>16_entity_resolution_dense</h3>
+                    <span class="type-badge-inline">Entity Resolution</span>
+                </div>
+                <span class="status-badge badge-pass">PASS (3/3)</span>
+            </div>
+            <div class="use-case-content" id="content-16_entity_resolution_dense">
+                <div class="metadata-grid">
+                    <div>
+                        <strong>Problem</strong>
+                        <p>Entity Resolution</p>
+                    </div>
+                    <div>
+                        <strong>Technique</strong>
+                        <p>Dense catalogue matching</p>
+                    </div>
+                    <div>
+                        <strong>Application</strong>
+                        <p>Resolve informal luxury-retail product names to canonical catalogue SKUs with embeddings.</p>
+                    </div>
+                    <div>
+                        <strong>Model &amp; Library</strong>
+                        <p class="mono">sentence-transformers/all-mpnet-base-v2 (sentence-transformers)</p>
+                        <div class="code-info-container">
+                            <span class="info-icon-badge">View Code &amp; Params</span>
+                            <div class="code-tooltip">
+                                <strong>Loader</strong>
+                                <pre>SentenceTransformer(&#x27;all-mpnet-base-v2&#x27;, device=&#x27;cpu&#x27;)</pre>
+                                <strong>Parameters</strong>
+                                <pre>catalog encoded once</pre>
+                                <strong>Inference Call</strong>
+                                <pre>util.cos_sim(query_embedding, catalog_embeddings)</pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <strong>Runtime Tier</strong>
+                        <p>medium</p>
+                    </div>
+                    <div>
+                        <strong>Primary Metric</strong>
+                        <p>pass_rate</p>
+                    </div>
+                    <div>
+                        <strong>Performance</strong>
+                        <p>Load: 5.768s | Inference: 0.188s | Total: 5.956s</p>
+                    </div>
+                    <div>
+                        <strong>Completed At</strong>
+                        <p>N/A</p>
+                    </div>
+                </div>
+                <div class="metrics-box">
+                    <strong>Metrics</strong>
+                    <ul><li><strong>pass_rate:</strong> 1.0</li></ul>
+                </div>
+                
+                <h4>Evaluation Examples</h4>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 5%">#</th>
+                                <th style="width: 35%">Input</th>
+                                <th style="width: 15%">Expected</th>
+                                <th style="width: 15%">Actual</th>
+                                <th style="width: 10%">Status</th>
+                                <th style="width: 10%">Time</th>
+                                <th style="width: 10%">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+            <tr>
+                <td>1</td>
+                <td title="JW Blue 1 litre">JW Blue 1 litre</td>
+                <td class="mono">&quot;JW-BLUE-1L&quot;</td>
+                <td class="mono">&quot;JW-BLUE-1L&quot;</td>
+                <td><span class="status-tag pass-tag">PASS</span></td>
+                <td>0.0613s</td>
+                <td class="notes-cell">sample_scores=[JW-BLUE-1L:0.685, MAC-18-700:0.491, DIOR-SADDLE-BLK:0.337]</td>
+            </tr>
+            
+            <tr>
+                <td>2</td>
+                <td title="Johnnie Walker Blue Label 1000ml">Johnnie Walker Blue Label 1000ml</td>
+                <td class="mono">&quot;JW-BLUE-1L&quot;</td>
+                <td class="mono">&quot;JW-BLUE-1L&quot;</td>
+                <td><span class="status-tag pass-tag">PASS</span></td>
+                <td>0.0619s</td>
+                <td class="notes-cell">sample_scores=[JW-BLUE-1L:1.0, MAC-18-700:0.593, DIOR-SADDLE-BLK:0.276]</td>
+            </tr>
+            
+            <tr>
+                <td>3</td>
+                <td title="Jonnie Walker Blu 1L">Jonnie Walker Blu 1L</td>
+                <td class="mono">&quot;JW-BLUE-1L&quot;</td>
+                <td class="mono">&quot;JW-BLUE-1L&quot;</td>
+                <td><span class="status-tag pass-tag">PASS</span></td>
+                <td>0.0650s</td>
+                <td class="notes-cell">sample_scores=[JW-BLUE-1L:0.577, MAC-18-700:0.422, DIOR-SADDLE-BLK:0.39]</td>
+            </tr>
+            
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="use-case-card" id="card-17_natural_language_inference">
+            <div class="use-case-header" onclick="toggleCard('17_natural_language_inference')">
+                <div class="header-left">
+                    <span class="collapse-icon" id="icon-17_natural_language_inference">&#9660;</span>
+                    <h3>17_natural_language_inference</h3>
+                    <span class="type-badge-inline">Natural Language Inference</span>
+                </div>
+                <span class="status-badge badge-pass">PASS (2/3)</span>
+            </div>
+            <div class="use-case-content" id="content-17_natural_language_inference">
+                <div class="metadata-grid">
+                    <div>
+                        <strong>Problem</strong>
+                        <p>Natural Language Inference</p>
+                    </div>
+                    <div>
+                        <strong>Technique</strong>
+                        <p>Three-way NLI classification</p>
+                    </div>
+                    <div>
+                        <strong>Application</strong>
+                        <p>Verify luxury-retail promotion compliance reports for entailment, neutrality, or contradiction.</p>
+                    </div>
+                    <div>
+                        <strong>Model &amp; Library</strong>
+                        <p class="mono">MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli (transformers)</p>
+                        <div class="code-info-container">
+                            <span class="info-icon-badge">View Code &amp; Params</span>
+                            <div class="code-tooltip">
+                                <strong>Loader</strong>
+                                <pre>AutoTokenizer.from_pretrained(model)
+AutoModelForSequenceClassification.from_pretrained(model)</pre>
+                                <strong>Parameters</strong>
+                                <pre>3-way NLI logits mapped to label names</pre>
+                                <strong>Inference Call</strong>
+                                <pre>softmax(model(tokenizer(premise, hypothesis)))</pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <strong>Runtime Tier</strong>
+                        <p>medium</p>
+                    </div>
+                    <div>
+                        <strong>Primary Metric</strong>
+                        <p>pass_rate</p>
+                    </div>
+                    <div>
+                        <strong>Performance</strong>
+                        <p>Load: 3.258s | Inference: 5.483s | Total: 8.741s</p>
+                    </div>
+                    <div>
+                        <strong>Completed At</strong>
+                        <p>N/A</p>
+                    </div>
+                </div>
+                <div class="metrics-box">
+                    <strong>Metrics</strong>
+                    <ul><li><strong>pass_rate:</strong> 0.6667</li></ul>
+                </div>
+                
+                <h4>Evaluation Examples</h4>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 5%">#</th>
+                                <th style="width: 35%">Input</th>
+                                <th style="width: 15%">Expected</th>
+                                <th style="width: 15%">Actual</th>
+                                <th style="width: 10%">Status</th>
+                                <th style="width: 10%">Time</th>
+                                <th style="width: 10%">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+            <tr>
+                <td>1</td>
+                <td title="{&#x27;premise&#x27;: &#x27;The May airport campaign brief states that every Dior handbag display must include the gold podium stand and the airport-exclusive signage.&#x27;, &#x27;hypothesis&#x27;: &#x27;The Dior handbag display includes the required podium stand and airport-exclusive signage.&#x27;}">{&#x27;premise&#x27;: &#x27;The May airport campaign brief states that every Dior handbag display must include the gold podium stand and the airport-exclusive signage.&#x27;, &#x27;hypothesis&#x27;: &#x27;The Dior handbag display in...</td>
+                <td class="mono">&quot;entailment&quot;</td>
+                <td class="mono">&quot;entailment&quot;</td>
+                <td><span class="status-tag pass-tag">PASS</span></td>
+                <td>1.8942s</td>
+                <td class="notes-cell">class_probs=[entailment:0.85, neutral:0.132, contradiction:0.019]</td>
+            </tr>
+            
+            <tr>
+                <td>2</td>
+                <td title="{&#x27;premise&#x27;: &#x27;The store report notes that the Dior handbag display was assembled before opening, but it does not mention the podium stand or signage.&#x27;, &#x27;hypothesis&#x27;: &#x27;The Dior handbag display includes the required podium stand and airport-exclusive signage.&#x27;}">{&#x27;premise&#x27;: &#x27;The store report notes that the Dior handbag display was assembled before opening, but it does not mention the podium stand or signage.&#x27;, &#x27;hypothesis&#x27;: &#x27;The Dior handbag display includ...</td>
+                <td class="mono">&quot;neutral&quot;</td>
+                <td class="mono">&quot;contradiction&quot;</td>
+                <td><span class="status-tag fail-tag">FAIL</span></td>
+                <td>1.8077s</td>
+                <td class="notes-cell">class_probs=[entailment:0.0, neutral:0.038, contradiction:0.961]</td>
+            </tr>
+            
+            <tr>
+                <td>3</td>
+                <td title="{&#x27;premise&#x27;: &#x27;The evening audit recorded that the Dior handbag display used a silver shelf and omitted the airport-exclusive signage due to missing stock.&#x27;, &#x27;hypothesis&#x27;: &#x27;The Dior handbag display includes the required podium stand and airport-exclusive signage.&#x27;}">{&#x27;premise&#x27;: &#x27;The evening audit recorded that the Dior handbag display used a silver shelf and omitted the airport-exclusive signage due to missing stock.&#x27;, &#x27;hypothesis&#x27;: &#x27;The Dior handbag display i...</td>
+                <td class="mono">&quot;contradiction&quot;</td>
+                <td class="mono">&quot;contradiction&quot;</td>
+                <td><span class="status-tag pass-tag">PASS</span></td>
+                <td>1.7813s</td>
+                <td class="notes-cell">class_probs=[entailment:0.0, neutral:0.001, contradiction:0.999]</td>
+            </tr>
+            
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="use-case-card" id="card-18_extractive_summarization">
+            <div class="use-case-header" onclick="toggleCard('18_extractive_summarization')">
+                <div class="header-left">
+                    <span class="collapse-icon" id="icon-18_extractive_summarization">&#9660;</span>
+                    <h3>18_extractive_summarization</h3>
+                    <span class="type-badge-inline">Extractive Summarization</span>
+                </div>
+                <span class="status-badge badge-pass">PASS (2/3)</span>
+            </div>
+            <div class="use-case-content" id="content-18_extractive_summarization">
+                <div class="metadata-grid">
+                    <div>
+                        <strong>Problem</strong>
+                        <p>Extractive Summarization</p>
+                    </div>
+                    <div>
+                        <strong>Technique</strong>
+                        <p>Sentence ranking</p>
+                    </div>
+                    <div>
+                        <strong>Application</strong>
+                        <p>Select the most important sentences from luxury-retail handover notes.</p>
+                    </div>
+                    <div>
+                        <strong>Model &amp; Library</strong>
+                        <p class="mono">curated_sentence_ranker_v1 (custom)</p>
+                        <div class="code-info-container">
+                            <span class="info-icon-badge">View Code &amp; Params</span>
+                            <div class="code-tooltip">
+                                <strong>Loader</strong>
+                                <pre>custom sentence ranker</pre>
+                                <strong>Parameters</strong>
+                                <pre>priority_terms, top_k=2</pre>
+                                <strong>Inference Call</strong>
+                                <pre>rank_sentences_by_keywords(text, priority_terms)</pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <strong>Runtime Tier</strong>
+                        <p>fast</p>
+                    </div>
+                    <div>
+                        <strong>Primary Metric</strong>
+                        <p>pass_rate</p>
+                    </div>
+                    <div>
+                        <strong>Performance</strong>
+                        <p>Load: 0.000s | Inference: 0.000s | Total: 0.000s</p>
+                    </div>
+                    <div>
+                        <strong>Completed At</strong>
+                        <p>N/A</p>
+                    </div>
+                </div>
+                <div class="metrics-box">
+                    <strong>Metrics</strong>
+                    <ul><li><strong>pass_rate:</strong> 0.6667</li></ul>
+                </div>
+                
+                <h4>Evaluation Examples</h4>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 5%">#</th>
+                                <th style="width: 35%">Input</th>
+                                <th style="width: 15%">Expected</th>
+                                <th style="width: 15%">Actual</th>
+                                <th style="width: 10%">Status</th>
+                                <th style="width: 10%">Time</th>
+                                <th style="width: 10%">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+            <tr>
+                <td>1</td>
+                <td title="Morning handover. The fragrance gondola was refilled before opening. A VIP traveller will collect a Cartier watch at 14:00 and customer service has been informed. The terminal manager requested a photo of the refreshed display.">Morning handover. The fragrance gondola was refilled before opening. A VIP traveller will collect a Cartier watch at 14:00 and customer service has been informed. The terminal manager requested a p...</td>
+                <td class="mono">[&quot;A VIP traveller will collect a Cartier watch at 14:00 and customer service has been informed.&quot;, &quot;The terminal manager requested a photo of the refreshed display.&quot;]</td>
+                <td class="mono">[&quot;A VIP traveller will collect a Cartier watch at 14:00 and customer service has been informed.&quot;, &quot;Morning handover.&quot;]</td>
+                <td><span class="status-tag fail-tag">FAIL</span></td>
+                <td>0.0002s</td>
+                <td class="notes-cell">selected_sentence_count=2</td>
+            </tr>
+            
+            <tr>
+                <td>2</td>
+                <td title="Afternoon handover. The Dior preorder was not ready when the traveller arrived and customer service promised an update. The engraving machine remains offline and engineering will review it tomorrow morning. A replacement gift box was issued for a damaged cosmetics purchase.">Afternoon handover. The Dior preorder was not ready when the traveller arrived and customer service promised an update. The engraving machine remains offline and engineering will review it tomorrow...</td>
+                <td class="mono">[&quot;The Dior preorder was not ready when the traveller arrived and customer service promised an update.&quot;, &quot;The engraving machine remains offline and engineering will review it tomorrow morning.&quot;]</td>
+                <td class="mono">[&quot;The Dior preorder was not ready when the traveller arrived and customer service promised an update.&quot;, &quot;The engraving machine remains offline and engineering will review it tomorrow morning.&quot;]</td>
+                <td><span class="status-tag pass-tag">PASS</span></td>
+                <td>0.0000s</td>
+                <td class="notes-cell">selected_sentence_count=2</td>
+            </tr>
+            
+            <tr>
+                <td>3</td>
+                <td title="Closing handover. Security could not account for one diamond bracelet after final count and the CCTV review has been escalated. The duty manager locked the jewellery cabinet and paused all bracelet sales. Housekeeping completed the standard boutique cleaning schedule.">Closing handover. Security could not account for one diamond bracelet after final count and the CCTV review has been escalated. The duty manager locked the jewellery cabinet and paused all bracelet...</td>
+                <td class="mono">[&quot;Security could not account for one diamond bracelet after final count and the CCTV review has been escalated.&quot;, &quot;The duty manager locked the jewellery cabinet and paused all bracelet sales.&quot;]</td>
+                <td class="mono">[&quot;Security could not account for one diamond bracelet after final count and the CCTV review has been escalated.&quot;, &quot;The duty manager locked the jewellery cabinet and paused all bracelet sales.&quot;]</td>
+                <td><span class="status-tag pass-tag">PASS</span></td>
+                <td>0.0000s</td>
+                <td class="notes-cell">selected_sentence_count=2</td>
+            </tr>
+            
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="use-case-card" id="card-19_optical_character_recognition">
+            <div class="use-case-header" onclick="toggleCard('19_optical_character_recognition')">
+                <div class="header-left">
+                    <span class="collapse-icon" id="icon-19_optical_character_recognition">&#9660;</span>
+                    <h3>19_optical_character_recognition</h3>
+                    <span class="type-badge-inline">Optical Character Recognition</span>
+                </div>
+                <span class="status-badge badge-amber">BORDERLINE (1/3)</span>
+            </div>
+            <div class="use-case-content" id="content-19_optical_character_recognition">
+                <div class="metadata-grid">
+                    <div>
+                        <strong>Problem</strong>
+                        <p>Optical Character Recognition</p>
+                    </div>
+                    <div>
+                        <strong>Technique</strong>
+                        <p>Transformer OCR</p>
+                    </div>
+                    <div>
+                        <strong>Application</strong>
+                        <p>Read compact luxury-retail receipt and pickup text from generated images.</p>
+                    </div>
+                    <div>
+                        <strong>Model &amp; Library</strong>
+                        <p class="mono">microsoft/trocr-small-printed (transformers)</p>
+                        <div class="code-info-container">
+                            <span class="info-icon-badge">View Code &amp; Params</span>
+                            <div class="code-tooltip">
+                                <strong>Loader</strong>
+                                <pre>TrOCRProcessor.from_pretrained(model)
+VisionEncoderDecoderModel.from_pretrained(model)</pre>
+                                <strong>Parameters</strong>
+                                <pre>generated receipt fixtures, image -&gt; pixel_values</pre>
+                                <strong>Inference Call</strong>
+                                <pre>model.generate(pixel_values) -&gt; processor.batch_decode(...)</pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <strong>Runtime Tier</strong>
+                        <p>heavy</p>
+                    </div>
+                    <div>
+                        <strong>Primary Metric</strong>
+                        <p>pass_rate</p>
+                    </div>
+                    <div>
+                        <strong>Performance</strong>
+                        <p>Load: 4.863s | Inference: 2.590s | Total: 7.453s</p>
+                    </div>
+                    <div>
+                        <strong>Completed At</strong>
+                        <p>N/A</p>
+                    </div>
+                </div>
+                <div class="metrics-box">
+                    <strong>Metrics</strong>
+                    <ul><li><strong>pass_rate:</strong> 0.3333</li></ul>
+                </div>
+                
+                <h4>Evaluation Examples</h4>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 5%">#</th>
+                                <th style="width: 35%">Input</th>
+                                <th style="width: 15%">Expected</th>
+                                <th style="width: 15%">Actual</th>
+                                <th style="width: 10%">Status</th>
+                                <th style="width: 10%">Time</th>
+                                <th style="width: 10%">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+            <tr>
+                <td>1</td>
+                <td title="receipt_01.png">receipt_01.png</td>
+                <td class="mono">&quot;RECEIPT T1-8841 TOTAL SGD 2450&quot;</td>
+                <td class="mono">&quot;RECEIPT T-18841 TOTAL S60 24550&quot;</td>
+                <td><span class="status-tag fail-tag">FAIL</span></td>
+                <td>1.0809s</td>
+                <td class="notes-cell">image_size=1200x220</td>
+            </tr>
+            
+            <tr>
+                <td>2</td>
+                <td title="receipt_02.png">receipt_02.png</td>
+                <td class="mono">&quot;RECEIPT HKG-92817 TOTAL HKD 2180&quot;</td>
+                <td class="mono">&quot;RECEIPT HKG-92817 TOTAL HKD 2180&quot;</td>
+                <td><span class="status-tag pass-tag">PASS</span></td>
+                <td>0.8635s</td>
+                <td class="notes-cell">image_size=1200x220</td>
+            </tr>
+            
+            <tr>
+                <td>3</td>
+                <td title="receipt_03.png">receipt_03.png</td>
+                <td class="mono">&quot;PICKUP ORDER VIP-331 GATE C3&quot;</td>
+                <td class="mono">&quot;PICKUP ORDER VIP-331 GATE CO&quot;</td>
+                <td><span class="status-tag fail-tag">FAIL</span></td>
+                <td>0.6451s</td>
+                <td class="notes-cell">image_size=1200x220</td>
+            </tr>
+            
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+                    </div>
+                </section>
+                <footer>
+                    Generated by <code>nlp-without-llm</code> using local study artifacts.
+                </footer>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

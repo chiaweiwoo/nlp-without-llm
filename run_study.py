@@ -2,11 +2,11 @@
 Study runner for nlp-without-llm.
 
 This workflow treats each use case as an independent local study artifact:
-- reuse an existing per-use-case JSON result when available
-- migrate legacy result files from older numbering when possible
-- run only missing baseline scenarios with moderate parallelism
-- record known impractical few-shot scenarios without executing them
-- rebuild output/results.json and output/report.html from per-use-case files
+- discover standalone study scripts
+- list study status without executing by default
+- run selected studies on demand
+- reuse or refresh per-use-case JSON results
+- rebuild output/results.json and output/report.html from saved artifacts
 """
 
 import argparse
@@ -26,30 +26,16 @@ sys.path.append(str(Path(__file__).resolve().parent))
 
 import lab.report
 from lab.contract import build_aggregated_results, build_result, save_result
+from lab.study_utils import load_json_fixture
 
 OUTPUT_DIR = Path("output")
 RESULTS_JSON_PATH = OUTPUT_DIR / "results.json"
 REPORT_HTML_PATH = OUTPUT_DIR / "report.html"
 USECASE_GLOB = "usecases/[0-9][0-9]_*.py"
 DEFAULT_TIMEOUT_S = 600
+RUNTIME_TIER_ORDER = {"fast": 0, "medium": 1, "heavy": 2}
 
-KNOWN_LIMITS = {
-    "12_fewshot_email_department": (
-        "Known local limit: this few-shot NLI prompt expansion took more than 20 minutes "
-        "on CPU in prior runs, so the study records it as not practical locally. A hosted "
-        "LLM API would likely be a better fit for this scenario."
-    ),
-    "13_fewshot_supplier_urgency": (
-        "Known local limit: this few-shot NLI prompt expansion took more than 20 minutes "
-        "on CPU in prior runs, so the study records it as not practical locally. A hosted "
-        "LLM API would likely be a better fit for this scenario."
-    ),
-    "14_fewshot_feedback_topic": (
-        "Known local limit: this few-shot NLI prompt expansion took more than 20 minutes "
-        "on CPU in prior runs, so the study records it as not practical locally. A hosted "
-        "LLM API would likely be a better fit for this scenario."
-    ),
-}
+KNOWN_LIMITS = {}
 
 LEGACY_USE_CASE_IDS = {
     "01_language_detection": "10_language_detection",
@@ -80,6 +66,11 @@ def get_script_metadata(script_path: Path) -> dict:
         "TASK_TYPE": "unknown",
         "TEST_CASES": [],
         "description": f"Use case {script_path.stem}",
+        "PROBLEM_NAME": "unknown",
+        "TECHNIQUE_NAME": "unknown",
+        "APPLICATION_NAME": "",
+        "COMPARISON_GROUP": "",
+        "RUNTIME_TIER": "medium",
     }
     try:
         content = script_path.read_text(encoding="utf-8")
@@ -99,10 +90,44 @@ def get_script_metadata(script_path: Path) -> dict:
                             try:
                                 metadata[name] = ast.literal_eval(node.value)
                             except Exception:
-                                pass
+                                if (
+                                    name == "TEST_CASES"
+                                    and isinstance(node.value, ast.Call)
+                                    and isinstance(node.value.func, ast.Name)
+                                    and node.value.func.id == "load_json_fixture"
+                                    and node.value.args
+                                    and isinstance(node.value.args[0], ast.Constant)
+                                    and isinstance(node.value.args[0].value, str)
+                                ):
+                                    metadata[name] = load_json_fixture(node.value.args[0].value)
     except Exception:
         pass
+
+    if metadata["PROBLEM_NAME"] == "unknown":
+        metadata["PROBLEM_NAME"] = metadata["TASK_TYPE"]
+    if metadata["TECHNIQUE_NAME"] == "unknown":
+        metadata["TECHNIQUE_NAME"] = metadata["MODEL_ID"]
+    if not metadata["APPLICATION_NAME"]:
+        metadata["APPLICATION_NAME"] = metadata["description"]
+    if not metadata["COMPARISON_GROUP"]:
+        metadata["COMPARISON_GROUP"] = metadata["PROBLEM_NAME"]
+    if metadata["RUNTIME_TIER"] not in RUNTIME_TIER_ORDER:
+        metadata["RUNTIME_TIER"] = "medium"
     return metadata
+
+
+def normalize_result(result: dict) -> dict:
+    if "status" not in result:
+        result["status"] = "ok" if result.get("error") is None else "failed"
+    result.setdefault("problem_name", result.get("type", "unknown"))
+    result.setdefault("technique_name", result.get("library", "unknown"))
+    result.setdefault("application_name", result.get("description", ""))
+    result.setdefault("comparison_group", result.get("problem_name", result.get("type", "unknown")))
+    result.setdefault("runtime_tier", "medium")
+    result.setdefault("primary_metric", "pass_rate")
+    result.setdefault("metrics", {"pass_rate": result.get("pass_rate", 0.0)})
+    result.setdefault("completed_at", None)
+    return result
 
 
 def get_total_memory_gb() -> float:
@@ -142,9 +167,7 @@ def get_default_workers() -> int:
 def load_result(path: Path) -> dict:
     with open(path, "r", encoding="utf-8") as f:
         result = json.load(f)
-    if "status" not in result:
-        result["status"] = "ok" if result.get("error") is None else "failed"
-    return result
+    return normalize_result(result)
 
 
 def is_reusable_result(result: dict) -> bool:
@@ -186,13 +209,18 @@ def build_failed_result(meta: dict, error_msg: str, status: str) -> dict:
         use_case_id=meta["USE_CASE_ID"],
         type=meta["TASK_TYPE"],
         description=meta["description"],
-        domain_relevance="N/A" if status != "ok" else "",
+        domain_relevance="N/A",
         model=meta["MODEL_ID"],
         library=library,
         model_load_time_s=0.0,
         test_cases=results,
         error=error_msg,
         status=status,
+        problem_name=meta.get("PROBLEM_NAME"),
+        technique_name=meta.get("TECHNIQUE_NAME"),
+        application_name=meta.get("APPLICATION_NAME"),
+        comparison_group=meta.get("COMPARISON_GROUP"),
+        runtime_tier=meta.get("RUNTIME_TIER", "medium"),
     )
 
 
@@ -251,9 +279,7 @@ def execute_script(script_path: Path, timeout_s: int) -> dict:
             status="failed",
         )
 
-    if "status" not in result:
-        result["status"] = "ok" if result.get("error") is None else "failed"
-    return result
+    return normalize_result(result)
 
 
 def write_known_limit_result(script_path: Path) -> dict:
@@ -267,22 +293,27 @@ def write_known_limit_result(script_path: Path) -> dict:
     return result
 
 
-def ensure_use_case_result(script_path: Path, timeout_s: int) -> tuple[str, dict | None]:
+def ensure_use_case_result(
+    script_path: Path,
+    timeout_s: int,
+    force: bool = False,
+) -> tuple[str, dict | None]:
     use_case_id = script_path.stem
     result_path = OUTPUT_DIR / f"result_{use_case_id}.json"
 
-    if use_case_id in KNOWN_LIMITS:
+    if not force and use_case_id in KNOWN_LIMITS:
         return "known_limit", write_known_limit_result(script_path)
 
-    if result_path.exists():
+    if not force and result_path.exists():
         result = load_result(result_path)
         if is_reusable_result(result):
             return "reused", result
         return "pending", None
 
-    migrated = migrate_legacy_result(use_case_id)
-    if migrated is not None:
-        return "migrated", migrated
+    if not force:
+        migrated = migrate_legacy_result(use_case_id)
+        if migrated is not None:
+            return "migrated", migrated
 
     return "pending", None
 
@@ -307,8 +338,82 @@ def aggregate_results_for_scripts(scripts: list[Path]) -> list[dict]:
     return use_cases
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(description="Run or reuse per-use-case study artifacts.")
+def matches_runtime_tier(meta: dict, max_tier: str) -> bool:
+    tier = meta.get("RUNTIME_TIER", "medium")
+    return RUNTIME_TIER_ORDER[tier] <= RUNTIME_TIER_ORDER[max_tier]
+
+
+def matches_problem(meta: dict, selector: str) -> bool:
+    normalized_selector = selector.strip().lower().replace(" ", "_")
+    candidates = {
+        meta.get("PROBLEM_NAME", ""),
+        meta.get("TASK_TYPE", ""),
+        meta.get("USE_CASE_ID", ""),
+    }
+    for candidate in candidates:
+        normalized_candidate = candidate.strip().lower().replace(" ", "_")
+        if normalized_candidate == normalized_selector:
+            return True
+    return False
+
+
+def filter_scripts(
+    scripts: list[Path],
+    only: str | None = None,
+    problem: str | None = None,
+    max_tier: str = "heavy",
+) -> list[Path]:
+    selected = []
+    for script_path in scripts:
+        meta = get_script_metadata(script_path)
+        if only and not (
+            script_path.stem == only
+            or script_path.stem.startswith(f"{only}_")
+            or script_path.name.startswith(f"{only}_")
+        ):
+            continue
+        if problem and not matches_problem(meta, problem):
+            continue
+        if not matches_runtime_tier(meta, max_tier):
+            continue
+        selected.append(script_path)
+    return selected
+
+
+def print_study_status(scripts: list[Path]) -> None:
+    print("ID  Tier    Status        Problem")
+    print("--  ------  ------------  -------")
+    for script_path in scripts:
+        meta = get_script_metadata(script_path)
+        result_path = OUTPUT_DIR / f"result_{script_path.stem}.json"
+        if result_path.exists():
+            status = load_result(result_path).get("status", "unknown")
+        elif script_path.stem in KNOWN_LIMITS:
+            status = "known_limit"
+        else:
+            status = "not_run"
+        print(
+            f"{script_path.stem[:2]}  "
+            f"{meta.get('RUNTIME_TIER', 'medium'):<6}  "
+            f"{status:<12}  "
+            f"{meta.get('PROBLEM_NAME', 'unknown')}"
+        )
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Run or inspect local study artifacts.")
+    parser.add_argument("--list", action="store_true", help="List study status without executing.")
+    parser.add_argument("--all", action="store_true", help="Run all selected studies.")
+    parser.add_argument("--only", help="Run one study by numeric prefix or full use-case id.")
+    parser.add_argument("--problem", help="Run all studies for one problem name.")
+    parser.add_argument("--report-only", action="store_true", help="Render aggregate outputs from saved results only.")
+    parser.add_argument("--force", action="store_true", help="Re-run even when a reusable result exists.")
+    parser.add_argument(
+        "--max-tier",
+        choices=sorted(RUNTIME_TIER_ORDER, key=RUNTIME_TIER_ORDER.get),
+        default="heavy",
+        help="Maximum runtime tier to include.",
+    )
     parser.add_argument("--workers", type=int, default=None, help="Moderate parallel worker count.")
     parser.add_argument(
         "--timeout-s",
@@ -321,17 +426,47 @@ def main() -> None:
         action="store_true",
         help="Skip HTML report generation after aggregating results.",
     )
-    args = parser.parse_args()
+    return parser.parse_args()
 
+
+def main() -> None:
+    args = parse_args()
     OUTPUT_DIR.mkdir(exist_ok=True)
+
+    scripts = filter_scripts(
+        discover_scripts(),
+        only=args.only,
+        problem=args.problem,
+        max_tier=args.max_tier,
+    )
+
+    if args.report_only:
+        started_at = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+        aggregated = build_aggregated_results(
+            use_cases=aggregate_results_for_scripts(scripts),
+            started_at=started_at,
+            finished_at=started_at,
+            total_wall_time_s=0.0,
+            host_os=f"{platform.system()}-{platform.release()}",
+            python_version=platform.python_version(),
+        )
+        with open(RESULTS_JSON_PATH, "w", encoding="utf-8") as f:
+            json.dump(aggregated, f, indent=2, ensure_ascii=False)
+        if not args.skip_html:
+            lab.report.render(aggregated, REPORT_HTML_PATH)
+        return
+
+    should_execute = bool(args.all or args.only or args.problem)
+    if args.list or not should_execute:
+        print_study_status(scripts)
+        return
+
     started_at = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     t_start = time.perf_counter()
-
-    scripts = discover_scripts()
     pending_scripts: list[Path] = []
 
     for script_path in scripts:
-        state, _ = ensure_use_case_result(script_path, args.timeout_s)
+        state, _ = ensure_use_case_result(script_path, args.timeout_s, force=args.force)
         if state == "pending":
             pending_scripts.append(script_path)
 

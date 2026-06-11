@@ -1,0 +1,26 @@
+[
+  {
+    "id": "sop_returns_unopened",
+    "text": "Unopened fragrance and cosmetics items may be returned within 14 days with the original receipt and full packaging."
+  },
+  {
+    "id": "sop_authenticity_card",
+    "text": "If a watch authenticity card is missing, staff must verify the serial number, contact the brand liaison, and document the handover before release."
+  },
+  {
+    "id": "sop_missed_collection",
+    "text": "If a traveller misses airport preorder collection, staff must cancel the airside hold, move the item to customer service review, and contact the traveller for next steps."
+  },
+  {
+    "id": "sop_opened_cosmetics",
+    "text": "Opened cosmetics and skincare items are not eligible for return unless a product defect is confirmed by the boutique manager."
+  },
+  {
+    "id": "sop_repair_watch",
+    "text": "Luxury watch repair requests require the warranty card, proof of purchase, and a condition assessment form."
+  },
+  {
+    "id": "sop_damaged_packaging",
+    "text": "If premium packaging is damaged before collection, staff should replace the box where possible and record the packaging issue in the daily log."
+  }
+]

@@ -1,0 +1,52 @@
+{
+  "use_case_id": "02_translate_zh_en",
+  "type": "translation",
+  "description": "Translate Mandarin luxury-retail enquiries into English for staff triage.",
+  "domain_relevance": "Airport luxury boutiques often need quick local translation before boarding windows close.",
+  "model": "facebook/nllb-200-distilled-600M",
+  "library": "transformers",
+  "model_load_time_s": 11.3754,
+  "test_cases": [
+    {
+      "input": "这款手表有全球保修吗？",
+      "expected": "Does this watch come with a global warranty?",
+      "actual": "Is this watch global warranty?",
+      "passed": true,
+      "inference_time_s": 3.3656,
+      "notes": "actual='Is this watch global warranty?' cosine=0.9023"
+    },
+    {
+      "input": "我可以在登机前领取预订的香水吗？",
+      "expected": "Can I collect the reserved perfume before boarding?",
+      "actual": "Can I get the booked perfume before boarding?",
+      "passed": true,
+      "inference_time_s": 2.2743,
+      "notes": "actual='Can I get the booked perfume before boarding?' cosine=0.9005"
+    },
+    {
+      "input": "这个包是机场限定款吗？",
+      "expected": "Is this bag an airport-exclusive edition?",
+      "actual": "Is this a limited amount for the airport?",
+      "passed": false,
+      "inference_time_s": 1.9709,
+      "notes": "actual='Is this a limited amount for the airport?' cosine=0.5702"
+    }
+  ],
+  "pass_count": 2,
+  "total_count": 3,
+  "pass_rate": 0.6667,
+  "total_inference_time_s": 7.6108,
+  "total_runtime_s": 18.9862,
+  "error": null,
+  "status": "ok",
+  "problem_name": "Machine Translation",
+  "technique_name": "Encoder-decoder transformer",
+  "application_name": "Translate Mandarin luxury-retail enquiries into English for boutique and airport staff.",
+  "comparison_group": "machine_translation",
+  "runtime_tier": "heavy",
+  "primary_metric": "pass_rate",
+  "metrics": {
+    "pass_rate": 0.6667
+  },
+  "completed_at": null
+}

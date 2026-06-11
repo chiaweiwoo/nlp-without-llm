@@ -1,0 +1,52 @@
+{
+  "use_case_id": "03_sentiment_customer_review",
+  "type": "sentiment",
+  "description": "Score luxury-retail customer review sentiment with a transparent domain lexicon.",
+  "domain_relevance": "A simple baseline helps measure whether a small local transformer is worth the extra cost.",
+  "model": "curated_luxury_retail_lexicon_v1",
+  "library": "custom",
+  "model_load_time_s": 0.0,
+  "test_cases": [
+    {
+      "input": "The beauty advisor explained the fragrance notes beautifully and wrapped everything with care.",
+      "expected": "positive",
+      "actual": "positive",
+      "passed": true,
+      "inference_time_s": 0.0001,
+      "notes": "positive_hits=2 negative_hits=0 token_count=13"
+    },
+    {
+      "input": "The boutique had the handbag in stock, but only in the black colourway.",
+      "expected": "neutral",
+      "actual": "neutral",
+      "passed": true,
+      "inference_time_s": 0.0,
+      "notes": "positive_hits=0 negative_hits=0 token_count=13"
+    },
+    {
+      "input": "The perfume box was damaged and the staff refused to replace it before boarding.",
+      "expected": "negative",
+      "actual": "negative",
+      "passed": true,
+      "inference_time_s": 0.0,
+      "notes": "positive_hits=0 negative_hits=2 token_count=14"
+    }
+  ],
+  "pass_count": 3,
+  "total_count": 3,
+  "pass_rate": 1.0,
+  "total_inference_time_s": 0.0001,
+  "total_runtime_s": 0.0001,
+  "error": null,
+  "status": "ok",
+  "problem_name": "Sentiment Analysis",
+  "technique_name": "Lexicon scoring",
+  "application_name": "Evaluate post-purchase luxury-retail reviews with a transparent lexicon baseline.",
+  "comparison_group": "sentiment_analysis",
+  "runtime_tier": "fast",
+  "primary_metric": "pass_rate",
+  "metrics": {
+    "pass_rate": 1.0
+  },
+  "completed_at": null
+}

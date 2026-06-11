@@ -1,0 +1,134 @@
+{
+  "use_case_id": "06_ner_people_orgs_procurement",
+  "type": "ner",
+  "description": "Extract brands, people, organisations, and locations with a pretrained transformer tagger.",
+  "domain_relevance": "This measures the accuracy gain from a general transformer NER model on luxury-retail notes.",
+  "model": "dslim/bert-base-NER",
+  "library": "transformers",
+  "model_load_time_s": 1.9045,
+  "test_cases": [
+    {
+      "input": "Dior confirmed the reservation at Changi Terminal 1 for Sophie Tan.",
+      "expected": [
+        [
+          "Changi Terminal 1",
+          "LOC"
+        ],
+        [
+          "Dior",
+          "ORG"
+        ],
+        [
+          "Sophie Tan",
+          "PER"
+        ]
+      ],
+      "actual": [
+        [
+          "Changi Terminal 1",
+          "LOC"
+        ],
+        [
+          "Dior",
+          "ORG"
+        ],
+        [
+          "Sophie Tan",
+          "PER"
+        ]
+      ],
+      "passed": true,
+      "inference_time_s": 0.4923,
+      "notes": "precision=1.0 recall=1.0 f1=1.0 raw_ner=[('Dior', 'ORG'), ('Changi Terminal 1', 'LOC'), ('Sophie Tan', 'PER')]"
+    },
+    {
+      "input": "Cartier asked James Wu from Heathrow Boutique to verify the watch pickup.",
+      "expected": [
+        [
+          "Cartier",
+          "ORG"
+        ],
+        [
+          "Heathrow Boutique",
+          "ORG"
+        ],
+        [
+          "James Wu",
+          "PER"
+        ]
+      ],
+      "actual": [
+        [
+          "##tier",
+          "ORG"
+        ],
+        [
+          "Car",
+          "PER"
+        ],
+        [
+          "Heathrow Boutique",
+          "ORG"
+        ],
+        [
+          "James Wu",
+          "PER"
+        ]
+      ],
+      "passed": false,
+      "inference_time_s": 0.0685,
+      "notes": "precision=0.5 recall=0.6667 f1=0.5714 raw_ner=[('Car', 'PER'), ('##tier', 'ORG'), ('James Wu', 'PER'), ('Heathrow Boutique', 'ORG')]"
+    },
+    {
+      "input": "Macallan inventory for Hong Kong Airport was signed off by Elaine Lim.",
+      "expected": [
+        [
+          "Elaine Lim",
+          "PER"
+        ],
+        [
+          "Hong Kong Airport",
+          "LOC"
+        ],
+        [
+          "Macallan",
+          "ORG"
+        ]
+      ],
+      "actual": [
+        [
+          "Elaine Lim",
+          "PER"
+        ],
+        [
+          "Hong Kong Airport",
+          "LOC"
+        ],
+        [
+          "Macallan",
+          "ORG"
+        ]
+      ],
+      "passed": true,
+      "inference_time_s": 0.0753,
+      "notes": "precision=1.0 recall=1.0 f1=1.0 raw_ner=[('Macallan', 'ORG'), ('Hong Kong Airport', 'LOC'), ('Elaine Lim', 'PER')]"
+    }
+  ],
+  "pass_count": 2,
+  "total_count": 3,
+  "pass_rate": 0.6667,
+  "total_inference_time_s": 0.6361,
+  "total_runtime_s": 2.5406,
+  "error": null,
+  "status": "ok",
+  "problem_name": "Named Entity Recognition",
+  "technique_name": "Transformer token classification",
+  "application_name": "Extract brands, people, organisations, and locations from luxury-retail service notes.",
+  "comparison_group": "named_entity_recognition",
+  "runtime_tier": "medium",
+  "primary_metric": "entity_f1_threshold",
+  "metrics": {
+    "pass_rate": 0.6667
+  },
+  "completed_at": null
+}

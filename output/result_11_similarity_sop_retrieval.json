@@ -1,0 +1,52 @@
+{
+  "use_case_id": "11_similarity_sop_retrieval",
+  "type": "information_retrieval",
+  "description": "Retrieve luxury-retail SOP passages with dense bi-encoder embeddings.",
+  "domain_relevance": "This measures the semantic retrieval gain from local embeddings over purely lexical search.",
+  "model": "sentence-transformers/all-mpnet-base-v2",
+  "library": "sentence-transformers",
+  "model_load_time_s": 6.0766,
+  "test_cases": [
+    {
+      "input": "Can a traveller return an unopened perfume without the original receipt?",
+      "expected": "sop_returns_unopened",
+      "actual": "sop_returns_unopened",
+      "passed": true,
+      "inference_time_s": 0.0836,
+      "notes": "cosine_scores=[sop_returns_unopened:0.729, sop_authenticity_card:0.328, sop_missed_collection:0.285, sop_opened_cosmetics:0.64, sop_repair_watch:0.191, sop_damaged_packaging:0.338] matched_text='Unopened fragrance and cosmetics items may be returned within 14 days with the original receipt and full packaging.'"
+    },
+    {
+      "input": "What should staff do when a luxury watch authenticity card is missing?",
+      "expected": "sop_authenticity_card",
+      "actual": "sop_authenticity_card",
+      "passed": true,
+      "inference_time_s": 0.079,
+      "notes": "cosine_scores=[sop_returns_unopened:0.298, sop_authenticity_card:0.829, sop_missed_collection:0.251, sop_opened_cosmetics:0.325, sop_repair_watch:0.632, sop_damaged_packaging:0.442] matched_text='If a watch authenticity card is missing, staff must verify the serial number, contact the brand liaison, and document the handover before release.'"
+    },
+    {
+      "input": "Can an airport preorder be collected after the passenger's flight departs?",
+      "expected": "sop_missed_collection",
+      "actual": "sop_missed_collection",
+      "passed": true,
+      "inference_time_s": 0.0819,
+      "notes": "cosine_scores=[sop_returns_unopened:0.186, sop_authenticity_card:0.119, sop_missed_collection:0.689, sop_opened_cosmetics:0.102, sop_repair_watch:-0.013, sop_damaged_packaging:0.187] matched_text='If a traveller misses airport preorder collection, staff must cancel the airside hold, move the item to customer service review, and contact the traveller for next steps.'"
+    }
+  ],
+  "pass_count": 3,
+  "total_count": 3,
+  "pass_rate": 1.0,
+  "total_inference_time_s": 0.2445,
+  "total_runtime_s": 6.3211,
+  "error": null,
+  "status": "ok",
+  "problem_name": "Information Retrieval",
+  "technique_name": "Dense bi-encoder retrieval",
+  "application_name": "Retrieve luxury-retail SOP passages for staff questions using semantic embeddings.",
+  "comparison_group": "sop_retrieval",
+  "runtime_tier": "medium",
+  "primary_metric": "pass_rate",
+  "metrics": {
+    "pass_rate": 1.0
+  },
+  "completed_at": null
+}

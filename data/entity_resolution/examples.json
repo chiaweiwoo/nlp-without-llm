@@ -1,0 +1,14 @@
+[
+  {
+    "input": "JW Blue 1 litre",
+    "expected": "JW-BLUE-1L"
+  },
+  {
+    "input": "Johnnie Walker Blue Label 1000ml",
+    "expected": "JW-BLUE-1L"
+  },
+  {
+    "input": "Jonnie Walker Blu 1L",
+    "expected": "JW-BLUE-1L"
+  }
+]

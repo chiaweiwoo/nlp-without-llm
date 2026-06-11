@@ -2,73 +2,118 @@
 
 ## Project Overview
 
-This repository demonstrates offline pretrained NLP models for travel-retail
-use cases. It uses Python 3.11+, `uv`, Hugging Face Transformers, PyTorch, and
-Sentence Transformers.
+This repository is an offline NLP learning lab for **luxury retail** scenarios.
+It uses Python 3.11+, `uv`, Hugging Face Transformers, PyTorch, Sentence
+Transformers, and a small amount of classical NLP / deterministic parsing.
 
-The main entry points are:
+The repository is being redesigned around this structure:
 
-- `run_study.py`: discovers use-case scripts, reuses or creates per-use-case
-  result artifacts, writes `output/results.json`, and optionally renders
-  `output/report.html`.
-- `usecases/NN_*.py`: standalone model-backed examples that print one JSON
-  result to stdout.
-- `lab/contract.py`: defines the shared result schema via `build_result`.
-- `lab/report.py`: renders the aggregated HTML report.
-- `tests/`: fast unit tests for runner and report behavior.
+> **formal NLP problem -> technical method -> luxury-retail application**
 
-## Setup And Commands
+The canonical roadmap is
+[docs/study-plan.md](/C:/Users/chiaw/OneDrive/Desktop/playground/nlp-without-llm/docs/study-plan.md).
 
-Use `uv` for dependency and command execution:
+## Planned Stages
 
-```bash
-uv sync
-uv run python -m pytest -q
-uv run python usecases/04_sentiment_internal_escalation.py
-uv run python run_study.py --skip-html
-uv run python run_study.py
-```
+1. Update repository documentation and agent instructions.
+2. Replace the old use-case set with the new problem-technique curriculum,
+   prepare fixtures, and generate validated outputs.
+3. Aggregate all per-study results into one HTML report.
 
-Run the unit tests before model-backed evaluations. A full evaluation can
-download several gigabytes of model weights, consume substantial memory, and
-take several minutes. Prefer running a single use-case script while developing
-that scenario.
+When implementing, preserve this stage order unless the user explicitly changes
+it.
+
+Do not stop at intermediate checkpoints when the user has asked for end-to-end
+execution. Continue until the requested scope is fully implemented, tested, and
+summarized unless the user explicitly says to pause.
+
+## Main Entry Points
+
+- `run_study.py`: study discovery, execution, caching/reuse, aggregation, and
+  report generation.
+- `usecases/NN_*.py`: standalone problem-technique study scripts that emit one
+  JSON result to stdout.
+- `lab/contract.py`: shared result contract and aggregation helpers.
+- `lab/report.py`: aggregate HTML report.
+- `tests/`: fast unit tests for runner, contract, and report behavior.
+- `data/`: committed fixtures, corpora, catalogues, policies, support sets, and
+  OCR assets used by studies.
 
 ## Implementation Conventions
 
-- Keep each use case independently executable.
-- Name use-case files `NN_descriptive_name.py` with a two-digit prefix.
+- Keep each study independently executable.
+- Name study files `NN_descriptive_name.py` with a two-digit prefix.
+- Model each study as one **problem + technique + application** combination.
+- Use technical names for `problem_name` and `technique_name`.
+- Keep luxury-retail wording in examples, corpora, and supporting data.
+- Default to exactly **3 evaluation examples** per study.
+- For multiclass classification, use at least **3 classes** and one evaluation
+  example per class.
+- When multiple techniques address the same formal problem, they must share the
+  same evaluation inputs.
+- Few-shot support examples are training fixtures and must be kept separate from
+  the 3 evaluation examples.
 - Define `USE_CASE_ID`, `MODEL_ID`, `TASK_TYPE`, and `TEST_CASES` at module
   level. `USE_CASE_ID` should match the filename stem.
 - Implement `run() -> dict` and return `lab.contract.build_result(...)`.
-- Keep stdout machine-readable: the script's successful stdout must be a
-  single valid JSON document. Send diagnostics elsewhere or include them in
-  result fields.
-- Record model load time separately from per-case inference time.
-- Every test-case result should include `input`, `expected`, `actual`,
-  `passed`, `inference_time_s`, and useful `notes`.
+- Keep stdout machine-readable: successful stdout must be one valid JSON
+  document.
+- Record model load time separately from inference time.
+- Every result case should include `input`, `expected`, `actual`, `passed`,
+  `inference_time_s`, and `notes`.
 - Preserve Unicode by serializing with `ensure_ascii=False` and UTF-8.
-- Do not add network APIs or hosted LLM dependencies. Inference is intended to
-  work offline after model weights are cached.
-- Keep report generation driven by the aggregated result schema rather than
-  hard-coding individual use cases.
+- Do not add hosted LLM dependencies or network APIs for inference.
+
+## Data And Artifact Policy
+
+Commit:
+
+- synthetic fixtures under `data/`
+- compact per-study JSON result artifacts
+- aggregate `output/results.json`
+- aggregate `output/report.html`
+- OCR fixture images and their metadata when used by a study
+
+Do not commit:
+
+- model weights
+- Hugging Face caches
+- virtual environments
+- temporary intermediates
+- large autogenerated blobs that are not required to understand or reproduce a
+  study result
+
+Keep repository artifacts GitHub-manageable. Favor compact synthetic data and
+small generated images.
+
+## Execution Expectations
+
+- Every committed study script must be **real and runnable**.
+- Do not represent unfinished work with fake successful outputs.
+- Once a study has been run successfully and its result is stored, that result
+  is a valid stopping point until code, fixtures, expected outputs, model ID, or
+  relevant configuration changes.
+- Prefer explicit runner modes such as `--list`, `--only`, `--problem`,
+  `--report-only`, and `--all`.
+- Runtime tiers such as `fast`, `medium`, and `heavy` are scheduling controls
+  only. They do not justify placeholder implementations.
 
 ## Testing Expectations
 
-- Add or update focused unit tests for runner, contract, or report changes.
+- Add or update focused unit tests for runner, contract, report, and fixture
+  handling changes.
 - Mock subprocesses and model boundaries in unit tests; unit tests must not
   download or load large models.
-- When adding or removing a use-case script, update discovery-count assertions
-  and user-facing documentation.
-- For a use-case change, run the unit suite first, then run only the affected
-  use case when cached model weights and resources are available.
-- Do not commit generated `output/results.json`, `output/report.html`, caches,
-  virtual environments, or model weights.
+- When adding or removing study scripts, update discovery-count assertions and
+  user-facing documentation.
+- Run the unit suite before model-backed evaluations.
+- Run only the affected study or problem group while iterating, unless the user
+  explicitly asks for broader execution.
 
 ## Change Discipline
 
-- Keep changes scoped to the requested behavior.
+- Keep changes scoped to the current stage and requested behavior.
 - Preserve existing user work in a dirty worktree.
 - Avoid unrelated formatting or dependency-lock churn.
-- Update `README.md` when use-case counts, commands, models, or reported
-  capabilities change.
+- Update `README.md` and `docs/study-plan.md` when the roadmap, curriculum,
+  execution commands, or artifact policy changes.

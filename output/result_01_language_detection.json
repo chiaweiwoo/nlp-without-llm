@@ -1,0 +1,52 @@
+{
+  "use_case_id": "01_language_detection",
+  "type": "language_detection",
+  "description": "Identify the language of traveller enquiries before routing them to support.",
+  "domain_relevance": "Luxury-retail support teams receive enquiries from international travellers before departure.",
+  "model": "papluca/xlm-roberta-base-language-detection",
+  "library": "transformers",
+  "model_load_time_s": 5.0707,
+  "test_cases": [
+    {
+      "input": "这款限量版手袋在登机前可以领取吗？",
+      "expected": "zh",
+      "actual": "zh",
+      "passed": true,
+      "inference_time_s": 0.6977,
+      "notes": "raw_label=zh score=0.9908"
+    },
+    {
+      "input": "Est-ce que cette montre est disponible au terminal 3 ?",
+      "expected": "fr",
+      "actual": "fr",
+      "passed": true,
+      "inference_time_s": 0.0873,
+      "notes": "raw_label=fr score=0.9939"
+    },
+    {
+      "input": "이 향수는 면세 할인이 적용되나요?",
+      "expected": "ko",
+      "actual": "ja",
+      "passed": false,
+      "inference_time_s": 0.0764,
+      "notes": "raw_label=ja score=0.5548"
+    }
+  ],
+  "pass_count": 2,
+  "total_count": 3,
+  "pass_rate": 0.6667,
+  "total_inference_time_s": 0.8614,
+  "total_runtime_s": 5.9321,
+  "error": null,
+  "status": "ok",
+  "problem_name": "Language Identification",
+  "technique_name": "Transformer classification",
+  "application_name": "Identify the language of traveller enquiries for luxury-retail support triage.",
+  "comparison_group": "language_identification",
+  "runtime_tier": "fast",
+  "primary_metric": "pass_rate",
+  "metrics": {
+    "pass_rate": 0.6667
+  },
+  "completed_at": null
+}

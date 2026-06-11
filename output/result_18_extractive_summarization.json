@@ -1,0 +1,70 @@
+{
+  "use_case_id": "18_extractive_summarization",
+  "type": "extractive_summarization",
+  "description": "Select the key sentences from luxury-retail handover notes.",
+  "domain_relevance": "Operations teams often need a concise handover without generating new text.",
+  "model": "curated_sentence_ranker_v1",
+  "library": "custom",
+  "model_load_time_s": 0.0,
+  "test_cases": [
+    {
+      "input": "Morning handover. The fragrance gondola was refilled before opening. A VIP traveller will collect a Cartier watch at 14:00 and customer service has been informed. The terminal manager requested a photo of the refreshed display.",
+      "expected": [
+        "A VIP traveller will collect a Cartier watch at 14:00 and customer service has been informed.",
+        "The terminal manager requested a photo of the refreshed display."
+      ],
+      "actual": [
+        "A VIP traveller will collect a Cartier watch at 14:00 and customer service has been informed.",
+        "Morning handover."
+      ],
+      "passed": false,
+      "inference_time_s": 0.0002,
+      "notes": "selected_sentence_count=2"
+    },
+    {
+      "input": "Afternoon handover. The Dior preorder was not ready when the traveller arrived and customer service promised an update. The engraving machine remains offline and engineering will review it tomorrow morning. A replacement gift box was issued for a damaged cosmetics purchase.",
+      "expected": [
+        "The Dior preorder was not ready when the traveller arrived and customer service promised an update.",
+        "The engraving machine remains offline and engineering will review it tomorrow morning."
+      ],
+      "actual": [
+        "The Dior preorder was not ready when the traveller arrived and customer service promised an update.",
+        "The engraving machine remains offline and engineering will review it tomorrow morning."
+      ],
+      "passed": true,
+      "inference_time_s": 0.0,
+      "notes": "selected_sentence_count=2"
+    },
+    {
+      "input": "Closing handover. Security could not account for one diamond bracelet after final count and the CCTV review has been escalated. The duty manager locked the jewellery cabinet and paused all bracelet sales. Housekeeping completed the standard boutique cleaning schedule.",
+      "expected": [
+        "Security could not account for one diamond bracelet after final count and the CCTV review has been escalated.",
+        "The duty manager locked the jewellery cabinet and paused all bracelet sales."
+      ],
+      "actual": [
+        "Security could not account for one diamond bracelet after final count and the CCTV review has been escalated.",
+        "The duty manager locked the jewellery cabinet and paused all bracelet sales."
+      ],
+      "passed": true,
+      "inference_time_s": 0.0,
+      "notes": "selected_sentence_count=2"
+    }
+  ],
+  "pass_count": 2,
+  "total_count": 3,
+  "pass_rate": 0.6667,
+  "total_inference_time_s": 0.0002,
+  "total_runtime_s": 0.0002,
+  "error": null,
+  "status": "ok",
+  "problem_name": "Extractive Summarization",
+  "technique_name": "Sentence ranking",
+  "application_name": "Select the most important sentences from luxury-retail handover notes.",
+  "comparison_group": "extractive_summarization",
+  "runtime_tier": "fast",
+  "primary_metric": "pass_rate",
+  "metrics": {
+    "pass_rate": 0.6667
+  },
+  "completed_at": null
+}

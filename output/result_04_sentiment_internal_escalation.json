@@ -1,0 +1,52 @@
+{
+  "use_case_id": "04_sentiment_internal_escalation",
+  "type": "sentiment",
+  "description": "Score luxury-retail customer review sentiment with a pretrained transformer classifier.",
+  "domain_relevance": "This provides a higher-capability local baseline to compare against the lexicon method.",
+  "model": "cardiffnlp/twitter-roberta-base-sentiment-latest",
+  "library": "transformers",
+  "model_load_time_s": 2.3371,
+  "test_cases": [
+    {
+      "input": "The beauty advisor explained the fragrance notes beautifully and wrapped everything with care.",
+      "expected": "positive",
+      "actual": "positive",
+      "passed": true,
+      "inference_time_s": 0.5334,
+      "notes": "raw_label=positive score=0.93"
+    },
+    {
+      "input": "The boutique had the handbag in stock, but only in the black colourway.",
+      "expected": "neutral",
+      "actual": "neutral",
+      "passed": true,
+      "inference_time_s": 0.0764,
+      "notes": "raw_label=neutral score=0.9066"
+    },
+    {
+      "input": "The perfume box was damaged and the staff refused to replace it before boarding.",
+      "expected": "negative",
+      "actual": "negative",
+      "passed": true,
+      "inference_time_s": 0.0854,
+      "notes": "raw_label=negative score=0.8803"
+    }
+  ],
+  "pass_count": 3,
+  "total_count": 3,
+  "pass_rate": 1.0,
+  "total_inference_time_s": 0.6952,
+  "total_runtime_s": 3.0323,
+  "error": null,
+  "status": "ok",
+  "problem_name": "Sentiment Analysis",
+  "technique_name": "Transformer sequence classification",
+  "application_name": "Evaluate post-purchase luxury-retail reviews with a pretrained transformer classifier.",
+  "comparison_group": "sentiment_analysis",
+  "runtime_tier": "medium",
+  "primary_metric": "pass_rate",
+  "metrics": {
+    "pass_rate": 1.0
+  },
+  "completed_at": null
+}

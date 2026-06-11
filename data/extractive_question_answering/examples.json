@@ -1,0 +1,17 @@
+[
+  {
+    "question": "How many days can unopened fragrance be returned?",
+    "context": "Return policy for luxury fragrance: unopened fragrance and cosmetics items may be returned within 14 days with the original receipt and full packaging. Opened items are excluded unless a defect is confirmed.",
+    "expected": "14 days"
+  },
+  {
+    "question": "What must staff verify when the authenticity card is missing?",
+    "context": "Watch authenticity exception process: if the authenticity card is missing, staff must verify the serial number, contact the brand liaison, and document the handover before release.",
+    "expected": "the serial number"
+  },
+  {
+    "question": "Are opened cosmetics eligible for return?",
+    "context": "Cosmetics return rule: opened cosmetics and skincare items are not eligible for return unless a product defect is confirmed by the boutique manager.",
+    "expected": "not eligible for return"
+  }
+]

@@ -1,0 +1,26 @@
+[
+  {
+    "input": "Dior confirmed the reservation at Changi Terminal 1 for Sophie Tan.",
+    "expected": [
+      ["Dior", "ORG"],
+      ["Changi Terminal 1", "LOC"],
+      ["Sophie Tan", "PER"]
+    ]
+  },
+  {
+    "input": "Cartier asked James Wu from Heathrow Boutique to verify the watch pickup.",
+    "expected": [
+      ["Cartier", "ORG"],
+      ["James Wu", "PER"],
+      ["Heathrow Boutique", "ORG"]
+    ]
+  },
+  {
+    "input": "Macallan inventory for Hong Kong Airport was signed off by Elaine Lim.",
+    "expected": [
+      ["Macallan", "ORG"],
+      ["Hong Kong Airport", "LOC"],
+      ["Elaine Lim", "PER"]
+    ]
+  }
+]

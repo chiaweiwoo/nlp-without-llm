@@ -1,0 +1,17 @@
+{
+  "inventory_exception": [
+    "The watch cabinet is empty even though the reservation system shows three units.",
+    "The fragrance refill shipment was delayed and the boutique cannot fulfil paid reservations.",
+    "The airport catalogue lists the handbag, but the shelf and storeroom are both empty."
+  ],
+  "client_service_exception": [
+    "A traveller complained that nobody assisted with luxury bag collection before boarding.",
+    "The adviser kept a customer waiting at the beauty counter for thirty minutes.",
+    "A preorder guest could not find any staff member to hand over the reserved watch."
+  ],
+  "loss_prevention_exception": [
+    "Two watches could not be located after the final security inventory check.",
+    "The jewellery tray count is short by one bracelet after shift handover.",
+    "Security is investigating a missing fragrance set from the locked storeroom."
+  ]
+}

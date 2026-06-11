@@ -1,0 +1,130 @@
+{
+  "use_case_id": "05_ner_brands_locations",
+  "type": "ner",
+  "description": "Extract brands, people, organisations, and locations with a luxury-retail gazetteer baseline.",
+  "domain_relevance": "A deterministic baseline shows how far curated phrase matching can go before a transformer is needed.",
+  "model": "curated_luxury_retail_gazetteer_v1",
+  "library": "custom",
+  "model_load_time_s": 0.0,
+  "test_cases": [
+    {
+      "input": "Dior confirmed the reservation at Changi Terminal 1 for Sophie Tan.",
+      "expected": [
+        [
+          "Changi Terminal 1",
+          "LOC"
+        ],
+        [
+          "Dior",
+          "ORG"
+        ],
+        [
+          "Sophie Tan",
+          "PER"
+        ]
+      ],
+      "actual": [
+        [
+          "Changi Terminal 1",
+          "LOC"
+        ],
+        [
+          "Dior",
+          "ORG"
+        ],
+        [
+          "Sophie Tan",
+          "PER"
+        ]
+      ],
+      "passed": true,
+      "inference_time_s": 0.0001,
+      "notes": "precision=1.0 recall=1.0 f1=1.0"
+    },
+    {
+      "input": "Cartier asked James Wu from Heathrow Boutique to verify the watch pickup.",
+      "expected": [
+        [
+          "Cartier",
+          "ORG"
+        ],
+        [
+          "Heathrow Boutique",
+          "ORG"
+        ],
+        [
+          "James Wu",
+          "PER"
+        ]
+      ],
+      "actual": [
+        [
+          "Cartier",
+          "ORG"
+        ],
+        [
+          "Heathrow Boutique",
+          "ORG"
+        ],
+        [
+          "James Wu",
+          "PER"
+        ]
+      ],
+      "passed": true,
+      "inference_time_s": 0.0,
+      "notes": "precision=1.0 recall=1.0 f1=1.0"
+    },
+    {
+      "input": "Macallan inventory for Hong Kong Airport was signed off by Elaine Lim.",
+      "expected": [
+        [
+          "Elaine Lim",
+          "PER"
+        ],
+        [
+          "Hong Kong Airport",
+          "LOC"
+        ],
+        [
+          "Macallan",
+          "ORG"
+        ]
+      ],
+      "actual": [
+        [
+          "Elaine Lim",
+          "PER"
+        ],
+        [
+          "Hong Kong Airport",
+          "LOC"
+        ],
+        [
+          "Macallan",
+          "ORG"
+        ]
+      ],
+      "passed": true,
+      "inference_time_s": 0.0,
+      "notes": "precision=1.0 recall=1.0 f1=1.0"
+    }
+  ],
+  "pass_count": 3,
+  "total_count": 3,
+  "pass_rate": 1.0,
+  "total_inference_time_s": 0.0001,
+  "total_runtime_s": 0.0001,
+  "error": null,
+  "status": "ok",
+  "problem_name": "Named Entity Recognition",
+  "technique_name": "Gazetteer and phrase matching",
+  "application_name": "Extract brands, people, organisations, and locations from luxury-retail service notes.",
+  "comparison_group": "named_entity_recognition",
+  "runtime_tier": "fast",
+  "primary_metric": "entity_f1_threshold",
+  "metrics": {
+    "pass_rate": 1.0
+  },
+  "completed_at": null
+}

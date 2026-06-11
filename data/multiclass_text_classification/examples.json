@@ -1,0 +1,14 @@
+[
+  {
+    "input": "The limited-edition handbag still shows available online, but the boutique has no stock for collection.",
+    "expected": "inventory_exception"
+  },
+  {
+    "input": "A VIP traveller has waited forty minutes for preorder collection assistance at the cosmetics counter.",
+    "expected": "client_service_exception"
+  },
+  {
+    "input": "A diamond bracelet is missing after the evening stock count in Terminal 2.",
+    "expected": "loss_prevention_exception"
+  }
+]

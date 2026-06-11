@@ -1,0 +1,14 @@
+[
+  {
+    "input": "这款限量版手袋在登机前可以领取吗？",
+    "expected": "zh"
+  },
+  {
+    "input": "Est-ce que cette montre est disponible au terminal 3 ?",
+    "expected": "fr"
+  },
+  {
+    "input": "이 향수는 면세 할인이 적용되나요?",
+    "expected": "ko"
+  }
+]

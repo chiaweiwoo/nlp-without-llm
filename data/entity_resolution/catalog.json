@@ -1,0 +1,26 @@
+[
+  {
+    "sku": "JW-BLUE-1L",
+    "name": "Johnnie Walker Blue Label 1000ml"
+  },
+  {
+    "sku": "MAC-18-700",
+    "name": "Macallan 18 Year Old 700ml"
+  },
+  {
+    "sku": "DIOR-SADDLE-BLK",
+    "name": "Dior Saddle Bag Black"
+  },
+  {
+    "sku": "CART-TANK-L",
+    "name": "Cartier Tank Louis Watch"
+  },
+  {
+    "sku": "CH-COCO-EDP",
+    "name": "Chanel Coco Mademoiselle Eau de Parfum"
+  },
+  {
+    "sku": "LV-KEEPALL-50",
+    "name": "Louis Vuitton Keepall 50"
+  }
+]

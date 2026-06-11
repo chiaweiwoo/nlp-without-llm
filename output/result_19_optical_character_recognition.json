@@ -1,0 +1,52 @@
+{
+  "use_case_id": "19_optical_character_recognition",
+  "type": "optical_character_recognition",
+  "description": "Read compact receipt and pickup text from generated luxury-retail image fixtures.",
+  "domain_relevance": "Receipt-like images are a realistic extension of offline retail workflows beyond plain text.",
+  "model": "microsoft/trocr-small-printed",
+  "library": "transformers",
+  "model_load_time_s": 4.8631,
+  "test_cases": [
+    {
+      "input": "receipt_01.png",
+      "expected": "RECEIPT T1-8841 TOTAL SGD 2450",
+      "actual": "RECEIPT T-18841 TOTAL S60 24550",
+      "passed": false,
+      "inference_time_s": 1.0809,
+      "notes": "image_size=1200x220"
+    },
+    {
+      "input": "receipt_02.png",
+      "expected": "RECEIPT HKG-92817 TOTAL HKD 2180",
+      "actual": "RECEIPT HKG-92817 TOTAL HKD 2180",
+      "passed": true,
+      "inference_time_s": 0.8635,
+      "notes": "image_size=1200x220"
+    },
+    {
+      "input": "receipt_03.png",
+      "expected": "PICKUP ORDER VIP-331 GATE C3",
+      "actual": "PICKUP ORDER VIP-331 GATE CO",
+      "passed": false,
+      "inference_time_s": 0.6451,
+      "notes": "image_size=1200x220"
+    }
+  ],
+  "pass_count": 1,
+  "total_count": 3,
+  "pass_rate": 0.3333,
+  "total_inference_time_s": 2.5895,
+  "total_runtime_s": 7.4526,
+  "error": null,
+  "status": "ok",
+  "problem_name": "Optical Character Recognition",
+  "technique_name": "Transformer OCR",
+  "application_name": "Read compact luxury-retail receipt and pickup text from generated images.",
+  "comparison_group": "optical_character_recognition",
+  "runtime_tier": "heavy",
+  "primary_metric": "pass_rate",
+  "metrics": {
+    "pass_rate": 0.3333
+  },
+  "completed_at": null
+}

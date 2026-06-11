@@ -14,6 +14,14 @@ def build_result(
     test_cases: list[dict],
     error: typing.Optional[str] = None,
     status: str | None = None,
+    problem_name: str | None = None,
+    technique_name: str | None = None,
+    application_name: str | None = None,
+    comparison_group: str | None = None,
+    runtime_tier: str | None = None,
+    primary_metric: str | None = None,
+    metrics: dict | None = None,
+    completed_at: str | None = None,
 ) -> dict:
     """
     Build the standard result dictionary for a use case.
@@ -31,6 +39,8 @@ def build_result(
     if resolved_status is None:
         resolved_status = "ok" if error is None else "failed"
 
+    resolved_metrics = metrics or {"pass_rate": pass_rate}
+
     return {
         "use_case_id": use_case_id,
         "type": type,
@@ -47,6 +57,14 @@ def build_result(
         "total_runtime_s": total_runtime_s,
         "error": error,
         "status": resolved_status,
+        "problem_name": problem_name or type,
+        "technique_name": technique_name or library,
+        "application_name": application_name or description,
+        "comparison_group": comparison_group or problem_name or type,
+        "runtime_tier": runtime_tier or "medium",
+        "primary_metric": primary_metric or "pass_rate",
+        "metrics": resolved_metrics,
+        "completed_at": completed_at,
     }
 
 

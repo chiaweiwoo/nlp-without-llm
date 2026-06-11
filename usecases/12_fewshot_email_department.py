@@ -1,112 +1,89 @@
 """
-Use case: Route internal emails to the correct department.
-Travel-retail relevance: Multi-department retail operations get hundreds of emails; auto-routing cuts triage time.
-Model: MoritzLaurer/deberta-v3-base-zeroshot-v2.0
-Library: transformers (manual sequence classification NLI evaluation with few-shot context)
+Formal problem: Information Retrieval.
+Luxury-retail application: Retrieve SOP passages with cross-encoder reranking.
+Model: cross-encoder/ms-marco-MiniLM-L6-v2
+Method: Cross-encoder reranking
 """
 
 import json
 import sys
 import time
 from pathlib import Path
-import torch
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
-# Add project root to sys.path
+from sentence_transformers import CrossEncoder
+
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from lab.contract import build_result
+from lab.study_utils import bm25_scores, build_bm25_index, load_json_fixture
 
 USE_CASE_ID = "12_fewshot_email_department"
-MODEL_ID = "MoritzLaurer/deberta-v3-base-zeroshot-v2.0"
-TASK_TYPE = "zero_shot_classification"
+MODEL_ID = "cross-encoder/ms-marco-MiniLM-L6-v2"
+TASK_TYPE = "information_retrieval"
+PROBLEM_NAME = "Information Retrieval"
+TECHNIQUE_NAME = "Cross-encoder reranking"
+APPLICATION_NAME = "Retrieve luxury-retail SOP passages by reranking lexical candidates with a local cross-encoder."
+COMPARISON_GROUP = "sop_retrieval"
+RUNTIME_TIER = "medium"
 
-# Descriptive hypotheses for NLI
-HYPOTHESES = {
-    "IT": "This email is about technical support, server down, or software issues.",
-    "Planner": "This email is about inventory planning, stock replenishment, or purchasing.",
-    "Pricing": "This email is about duty-free pricing, retail margins, or discounts.",
-    "Warehouse": "This email is about logistics, shipping containers, or physical storage.",
-    "Finance": "This email is about invoicing, accounting, or budget approval.",
-    "HR": "This email is about job recruitment, employee payroll, or training.",
-    "CustomerService": "This email is about customer feedback, complaints, or return requests.",
-    "Procurement": "This email is about supplier contracts, vendor agreements, or wholesale terms.",
-    "Marketing": "This email is about airport advertisements, loyalty programs, or retail campaigns.",
-    "Security": "This email is about store security, loss prevention, or customs compliance."
-}
+CORPUS = load_json_fixture("information_retrieval/corpus.json")
+TEST_CASES = load_json_fixture("information_retrieval/examples.json")
+TOP_K = 3
 
-# Few-shot context containing 1 example for each of the 10 labels
-FEW_SHOT_CONTEXT = """Below are examples of email classification:
-IT: "My screen is frozen and I can't log in."
-Planner: "We need to schedule the monthly order of whiskey bottles."
-Pricing: "Please update the duty-free price tags for the new cosmetics."
-Warehouse: "The container shipment from London is unloading at bay 4."
-Finance: "Attached is the invoice for the store construction audit."
-HR: "We have two interviews scheduled for the sales associate position."
-CustomerService: "The traveler wants to know if they can return a watch bought last week."
-Procurement: "The SLA agreement with the vendor has been signed by the director."
-Marketing: "The billboard at the terminal entrance needs to be updated with the summer sale ad."
-Security: "Please check the CCTV footage near the perfume counter."
-
-Now, classify this input email:
-"{text}"
-"""
-
-TEST_CASES = [
-    {"input": "Server is down, checkouts failing", "expected": "IT"},
-    {"input": "Need to reorder fragrance stock for the airport store, running low", "expected": "Planner"},
-    {"input": "Q3 expense report due Friday", "expected": "Finance"},
-    {"input": "Requesting supplier contract renewal terms for next year", "expected": "Procurement"},
-    {"input": "A customer reported a stolen handbag at the gate 3 shop", "expected": "Security"},
-]
 
 def run() -> dict:
     t0 = time.perf_counter()
-    tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
-    model = AutoModelForSequenceClassification.from_pretrained(MODEL_ID)
+    lexical_index = build_bm25_index([item["text"] for item in CORPUS])
+    reranker = CrossEncoder(MODEL_ID)
     load_time = time.perf_counter() - t0
 
     results = []
     for tc in TEST_CASES:
         t1 = time.perf_counter()
-        
-        # Build premise with few-shot context
-        premise = FEW_SHOT_CONTEXT.format(text=tc["input"])
-        
-        scores = {}
-        for label, hypothesis in HYPOTHESES.items():
-            inputs = tokenizer(premise, hypothesis, return_tensors="pt")
-            with torch.no_grad():
-                outputs = model(**inputs)
-            # MoritzLaurer/deberta-v3-base-zeroshot-v2.0 uses binary classification (entailment=0, not_entailment=1)
-            entail_score = torch.softmax(outputs.logits, dim=-1)[0][0].item()
-            scores[label] = entail_score
-            
-        actual = max(scores, key=scores.get)
-        passed = (actual == tc["expected"])
-        
-        scores_summary = ", ".join(f"{lbl}:{round(score, 3)}" for lbl, score in sorted(scores.items(), key=lambda x: x[1], reverse=True))
-        
-        results.append({
-            "input": tc["input"],
-            "expected": tc["expected"],
-            "actual": actual,
-            "passed": passed,
-            "inference_time_s": round(time.perf_counter() - t1, 4),
-            "notes": f"scores=[{scores_summary}]",
-        })
+        lexical_scores = bm25_scores(tc["input"], lexical_index)
+        candidate_indexes = sorted(
+            range(len(lexical_scores)),
+            key=lambda idx: lexical_scores[idx],
+            reverse=True,
+        )[:TOP_K]
+        candidate_pairs = [(tc["input"], CORPUS[idx]["text"]) for idx in candidate_indexes]
+        rerank_scores = reranker.predict(candidate_pairs)
+        best_local_idx = max(range(len(candidate_indexes)), key=lambda idx: rerank_scores[idx])
+        best_idx = candidate_indexes[best_local_idx]
+        actual = CORPUS[best_idx]["id"]
+        passed = actual == tc["expected"]
+
+        score_notes = ", ".join(
+            f"{CORPUS[idx]['id']}:{round(float(rerank_scores[pos]), 3)}"
+            for pos, idx in enumerate(candidate_indexes)
+        )
+        results.append(
+            {
+                "input": tc["input"],
+                "expected": tc["expected"],
+                "actual": actual,
+                "passed": passed,
+                "inference_time_s": round(time.perf_counter() - t1, 4),
+                "notes": f"rerank_scores=[{score_notes}] top_k={TOP_K}",
+            }
+        )
 
     return build_result(
         use_case_id=USE_CASE_ID,
         type=TASK_TYPE,
-        description="Route incoming internal emails using custom hypotheses and a 10-class few-shot context.",
-        domain_relevance="Reduces manual triage in a multi-department retail org.",
+        description="Retrieve luxury-retail SOP passages by reranking lexical candidates with a local cross-encoder.",
+        domain_relevance="This shows the accuracy tradeoff when a slower but stronger local reranker is added after lexical retrieval.",
         model=MODEL_ID,
-        library="transformers",
+        library="sentence-transformers",
         model_load_time_s=round(load_time, 4),
         test_cases=results,
+        problem_name=PROBLEM_NAME,
+        technique_name=TECHNIQUE_NAME,
+        application_name=APPLICATION_NAME,
+        comparison_group=COMPARISON_GROUP,
+        runtime_tier=RUNTIME_TIER,
     )
 
+
 if __name__ == "__main__":
-    sys.stdout.buffer.write(json.dumps(run(), indent=2, ensure_ascii=False).encode('utf-8'))
-    print()
+    print(json.dumps(run(), indent=2, ensure_ascii=False))
