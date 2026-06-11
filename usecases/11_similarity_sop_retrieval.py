@@ -1,6 +1,6 @@
 """
-Use case: Given a new complaint, retrieve the most similar past complaint.
-Travel-retail relevance: Customer service can reuse previous resolutions.
+Use case: Match a customer question to the most relevant internal SOP.
+Travel-retail relevance: Front-line staff find the right policy quickly.
 Model: sentence-transformers/all-MiniLM-L6-v2
 Library: sentence-transformers
 """
@@ -16,23 +16,22 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 from sentence_transformers import SentenceTransformer, util
 from lab.contract import build_result
 
-USE_CASE_ID = "08_similarity_complaint_lookup"
+USE_CASE_ID = "11_similarity_sop_retrieval"
 MODEL_ID = "sentence-transformers/all-mpnet-base-v2"
 TASK_TYPE = "semantic_similarity"
 
 CORPUS = [
-    {"id": "c1", "text": "Got a damaged cosmetic item"},
-    {"id": "c2", "text": "Cashier was rude at the HKG store"},
-    {"id": "c3", "text": "Double-charged on my credit card"},
-    {"id": "c4", "text": "Forgot to claim tax refund at the airport"},
-    {"id": "c5", "text": "Item different from website description"},
-    {"id": "c6", "text": "Long queue at checkout during peak hours"},
+    {"id": "sop_returns", "text": "Return policy: items can be returned within 30 days with receipt"},
+    {"id": "sop_refunds", "text": "Refund process for online and in-store purchases"},
+    {"id": "sop_tax_free", "text": "How customers claim tax-free refunds at the airport"},
+    {"id": "sop_lost_receipt", "text": "Procedure when a customer cannot produce a receipt"},
+    {"id": "sop_damaged_goods", "text": "Steps to handle a customer reporting a damaged purchase"},
 ]
 
 TEST_CASES = [
-    {"input": "My perfume bottle arrived broken", "expected": "c1"},
-    {"input": "Staff was impolite at HKG store", "expected": "c2"},
-    {"input": "Charged twice for the same purchase", "expected": "c3"},
+    {"input": "How do I claim a tax refund?", "expected": "sop_tax_free"},
+    {"input": "What if I lose my receipt?", "expected": "sop_lost_receipt"},
+    {"input": "Item arrived broken, what's the process?", "expected": "sop_damaged_goods"},
 ]
 
 def run() -> dict:
@@ -71,8 +70,8 @@ def run() -> dict:
     return build_result(
         use_case_id=USE_CASE_ID,
         type=TASK_TYPE,
-        description="Given a new complaint, retrieve the most similar past complaint.",
-        domain_relevance="Customer service can reuse previous resolutions.",
+        description="Match a customer question to the most relevant internal SOP.",
+        domain_relevance="Front-line staff find the right policy quickly.",
         model=MODEL_ID,
         library="sentence-transformers",
         model_load_time_s=round(load_time, 4),

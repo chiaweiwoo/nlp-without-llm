@@ -17,7 +17,7 @@ from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 from sentence_transformers import SentenceTransformer, util
 from lab.contract import build_result
 
-USE_CASE_ID = "11_translate_zh_en"
+USE_CASE_ID = "02_translate_zh_en"
 MODEL_ID = "facebook/nllb-200-distilled-600M"
 TASK_TYPE = "translation"
 

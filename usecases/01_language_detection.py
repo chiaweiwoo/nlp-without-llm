@@ -16,7 +16,7 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 from transformers import pipeline
 from lab.contract import build_result
 
-USE_CASE_ID = "10_language_detection"
+USE_CASE_ID = "01_language_detection"
 MODEL_ID = "papluca/xlm-roberta-base-language-detection"
 TASK_TYPE = "language_detection"
 

@@ -1,6 +1,6 @@
 """
-Use case: Pull people and organisation names from procurement emails.
-Travel-retail relevance: Auto-populate CRM and supplier contact records.
+Use case: Extract brand and location mentions from customer comments.
+Travel-retail relevance: Powers downstream analytics (which brands, which stores get most attention).
 Model: dslim/bert-base-NER
 Library: transformers
 """
@@ -16,22 +16,22 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 from transformers import pipeline
 from lab.contract import build_result
 
-USE_CASE_ID = "07_ner_people_orgs_procurement"
+USE_CASE_ID = "05_ner_brands_locations"
 MODEL_ID = "dslim/bert-base-NER"
 TASK_TYPE = "ner"
 
 TEST_CASES = [
     {
-        "input": "John from Acme Logistics confirmed delivery",
-        "expected": [["John", "PER"], ["Acme Logistics", "ORG"]],
+        "input": "Bought Chanel and Hermes at Changi yesterday",
+        "expected": [["Chanel", "ORG"], ["Hermes", "ORG"], ["Changi", "LOC"]],
     },
     {
-        "input": "Please contact Sarah Tan at Globex regarding the new collection",
-        "expected": [["Sarah Tan", "PER"], ["Globex", "ORG"]],
+        "input": "Macallan was sold out at the Hong Kong store",
+        "expected": [["Macallan", "ORG"], ["Hong Kong", "LOC"]],
     },
     {
-        "input": "Diageo representative will visit our Singapore office Monday",
-        "expected": [["Diageo", "ORG"], ["Singapore", "LOC"]],
+        "input": "Picked up Dior and Estee Lauder at LAX",
+        "expected": [["Dior", "ORG"], ["Estee Lauder", "ORG"], ["LAX", "LOC"]],
     },
 ]
 
@@ -62,12 +62,14 @@ def run() -> dict:
         out = ner(tc["input"])
         
         # Extract actual entities as a set of (word, entity_group)
+        # Note: clean up any leading/trailing spaces in word
         actual_entities = {(item["word"].strip(), item["entity_group"]) for item in out}
         expected_entities = {(item[0], item[1]) for item in tc["expected"]}
         
         precision, recall, f1 = calculate_f1(expected_entities, actual_entities)
         passed = (f1 >= 0.66)
         
+        # Convert expected and actual sets to sorted lists for JSON serialisation
         actual_list = sorted(list(actual_entities))
         expected_list = sorted(list(expected_entities))
         
@@ -83,8 +85,8 @@ def run() -> dict:
     return build_result(
         use_case_id=USE_CASE_ID,
         type=TASK_TYPE,
-        description="Pull people and organisation names from procurement emails.",
-        domain_relevance="Auto-populate CRM and supplier contact records.",
+        description="Extract brand and location mentions from customer comments.",
+        domain_relevance="Powers downstream analytics (which brands, which stores get most attention).",
         model=MODEL_ID,
         library="transformers",
         model_load_time_s=round(load_time, 4),

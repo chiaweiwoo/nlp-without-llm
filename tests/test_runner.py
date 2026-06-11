@@ -1,88 +1,90 @@
-import json
 import glob
+import json
 from pathlib import Path
 from unittest.mock import patch, MagicMock
-import pytest
-import run_all
+
+import run_study
+
 
 def test_use_cases_discovery():
-    """Verify that all 11 use case files are present and match the expected naming pattern."""
     scripts = glob.glob("usecases/[0-9][0-9]_*.py")
-    assert len(scripts) == 11, f"Expected 11 use case scripts, found {len(scripts)}"
+    assert len(scripts) == 14, f"Expected 14 use case scripts, found {len(scripts)}"
 
-def test_handle_failure_helper():
-    """Test that run_all.handle_failure returns a schema-compliant error dictionary."""
-    dummy_path = Path("usecases/99_dummy_nonexistent.py")
-    error_msg = "Test injected error message"
-    result = run_all.handle_failure(dummy_path, error_msg)
-    
-    assert result["use_case_id"] == "99_dummy_nonexistent"
-    assert result["error"] == error_msg
+
+def test_build_failed_result_uses_metadata():
+    script_path = Path("usecases/01_language_detection.py")
+    meta = run_study.get_script_metadata(script_path)
+
+    result = run_study.build_failed_result(meta, "timed out", status="timeout")
+
+    assert result["use_case_id"] == "01_language_detection"
+    assert result["status"] == "timeout"
+    assert result["error"] == "timed out"
     assert result["pass_count"] == 0
-    assert result["total_count"] == 1
-    assert result["pass_rate"] == 0.0
-    assert len(result["test_cases"]) == 1
-    assert result["test_cases"][0]["passed"] is False
-    assert error_msg in result["test_cases"][0]["notes"]
+    assert result["total_count"] == len(meta["TEST_CASES"])
+
 
 @patch("subprocess.run")
-def test_runner_graceful_subprocess_failure(mock_run, tmp_path):
-    """Test that the runner gracefully records an error and doesn't crash when a script returns exit code 1."""
+def test_runner_records_subprocess_failure(mock_run, tmp_path):
     mock_proc = MagicMock()
     mock_proc.returncode = 1
     mock_proc.stderr = "Injected subprocess stderr traceback"
     mock_proc.stdout = ""
     mock_run.return_value = mock_proc
 
-    with patch("sys.argv", ["run_all.py", "--only", "04", "--skip-html"]):
-        original_open = open
-        def mock_open(file, mode="r", *args, **kwargs):
-            if "results.json" in str(file):
-                return original_open(tmp_path / "results.json", mode, *args, **kwargs)
-            return original_open(file, mode, *args, **kwargs)
+    script_path = Path("usecases/03_sentiment_customer_review.py")
+    result = run_study.execute_script(script_path, timeout_s=600)
 
-        with patch("run_all.open", mock_open):
-            run_all.main()
+    assert result["use_case_id"] == "03_sentiment_customer_review"
+    assert result["status"] == "failed"
+    assert "Injected subprocess stderr traceback" in result["error"]
 
-        results_json = tmp_path / "results.json"
-        assert results_json.exists()
-        with open(results_json, "r", encoding="utf-8") as f:
-            data = json.load(f)
-        
-        # Verify results.json keys and schema types
-        assert "run_metadata" in data
-        assert "use_cases" in data
-        assert "summary" in data
-        assert data["summary"]["total_use_cases"] == 1
-        assert data["summary"]["successful_use_cases"] == 0
-        assert len(data["use_cases"]) == 1
-        assert data["use_cases"][0]["use_case_id"] == "04_sentiment_customer_review"
-        assert data["use_cases"][0]["error"] is not None
-        assert "Injected subprocess stderr traceback" in data["use_cases"][0]["error"]
+    saved_path = run_study.save_result(result, tmp_path)
+    with open(saved_path, "r", encoding="utf-8") as f:
+        saved = json.load(f)
+    assert saved["status"] == "failed"
+
 
 @patch("subprocess.run")
-def test_runner_malformed_json_handling(mock_run, tmp_path):
-    """Test that the runner gracefully handles malformed JSON output from use case scripts."""
+def test_runner_handles_malformed_json(mock_run):
     mock_proc = MagicMock()
     mock_proc.returncode = 0
     mock_proc.stdout = "Malformed raw non-JSON output"
+    mock_proc.stderr = ""
     mock_run.return_value = mock_proc
 
-    with patch("sys.argv", ["run_all.py", "--only", "04", "--skip-html"]):
-        original_open = open
-        def mock_open(file, mode="r", *args, **kwargs):
-            if "results.json" in str(file):
-                return original_open(tmp_path / "results.json", mode, *args, **kwargs)
-            return original_open(file, mode, *args, **kwargs)
+    result = run_study.execute_script(
+        Path("usecases/03_sentiment_customer_review.py"), timeout_s=600
+    )
 
-        with patch("run_all.open", mock_open):
-            run_all.main()
+    assert result["status"] == "failed"
+    assert "Failed to parse JSON" in result["error"]
 
-        results_json = tmp_path / "results.json"
-        assert results_json.exists()
-        with open(results_json, "r", encoding="utf-8") as f:
-            data = json.load(f)
 
-        assert data["summary"]["successful_use_cases"] == 0
-        assert len(data["use_cases"]) == 1
-        assert "Failed to parse JSON" in data["use_cases"][0]["error"]
+def test_migrate_legacy_result(tmp_path):
+    legacy_result = {
+        "use_case_id": "10_language_detection",
+        "type": "language_detection",
+        "description": "desc",
+        "domain_relevance": "relevance",
+        "model": "model",
+        "library": "transformers",
+        "model_load_time_s": 1.0,
+        "test_cases": [],
+        "pass_count": 0,
+        "total_count": 0,
+        "pass_rate": 0.0,
+        "total_inference_time_s": 0.0,
+        "total_runtime_s": 1.0,
+        "error": None,
+        "status": "ok",
+    }
+    legacy_path = tmp_path / "result_10_language_detection.json"
+    legacy_path.write_text(json.dumps(legacy_result), encoding="utf-8")
+
+    with patch.object(run_study, "OUTPUT_DIR", tmp_path):
+        migrated = run_study.migrate_legacy_result("01_language_detection")
+
+    assert migrated is not None
+    assert migrated["use_case_id"] == "01_language_detection"
+    assert (tmp_path / "result_01_language_detection.json").exists()

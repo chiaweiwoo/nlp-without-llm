@@ -7,5 +7,6 @@ __pycache__/
 .DS_Store
 output/results.json
 output/report.html
+output/result_*.json
 *.egg-info/
 .pytest_cache/

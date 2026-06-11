@@ -16,7 +16,7 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 from transformers import pipeline
 from lab.contract import build_result
 
-USE_CASE_ID = "05_sentiment_internal_escalation"
+USE_CASE_ID = "04_sentiment_internal_escalation"
 MODEL_ID = "cardiffnlp/twitter-roberta-base-sentiment-latest"
 TASK_TYPE = "sentiment"
 

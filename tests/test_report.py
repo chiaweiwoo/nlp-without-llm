@@ -23,8 +23,8 @@ def test_report_generation(tmp_path):
         },
         "use_cases": [
             {
-                "use_case_id": "01_classify_email_department",
-                "type": "zero_shot_classification",
+                "use_case_id": "01_language_detection",
+                "type": "language_detection",
                 "description": "Test description 1",
                 "domain_relevance": "Test relevance 1",
                 "model": "test-model-1",
@@ -38,10 +38,11 @@ def test_report_generation(tmp_path):
                 "pass_rate": 1.0,
                 "total_inference_time_s": 0.1,
                 "total_runtime_s": 1.1,
-                "error": None
+                "error": None,
+                "status": "ok"
             },
             {
-                "use_case_id": "04_sentiment_customer_review",
+                "use_case_id": "03_sentiment_customer_review",
                 "type": "sentiment",
                 "description": "Test description 2",
                 "domain_relevance": "Test relevance 2",
@@ -56,7 +57,8 @@ def test_report_generation(tmp_path):
                 "pass_rate": 0.0,
                 "total_inference_time_s": 0.2,
                 "total_runtime_s": 2.2,
-                "error": "Dummy error"
+                "error": "Dummy error",
+                "status": "failed"
             }
         ],
         "summary": {
@@ -77,8 +79,8 @@ def test_report_generation(tmp_path):
     html_content = report_file.read_text(encoding="utf-8")
     
     # Verify presence of key information
-    assert "01_classify_email_department" in html_content
-    assert "04_sentiment_customer_review" in html_content
+    assert "01_language_detection" in html_content
+    assert "03_sentiment_customer_review" in html_content
     assert "test-model-1" in html_content
     assert "test-model-2" in html_content
     
